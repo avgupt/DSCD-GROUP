@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message RegistryServer {
+    map<string, string> servers = 1;
+}
