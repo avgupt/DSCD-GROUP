@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "Article/Article.proto";
+import "Client/Client.proto";
+
+message Server {
+    string address = 1;
+    string name = 2;
+    repeated Article hosted_articles = 3;
+    repeated Client subscribers = 4;
+    repeated Client clientele = 5;
+}
