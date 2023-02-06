@@ -11,7 +11,6 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -20,11 +19,56 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\rArticle.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa1\x01\n\x07\x41rticle\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0e\n\x06\x61uthor\x18\x02 \x01(\t\x12(\n\x04time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x0f\n\x07\x63ontent\x18\x04 \x01(\t\x12\x10\n\x06sports\x18\x05 \x01(\tH\x00\x12\x11\n\x07\x66\x61shion\x18\x06 \x01(\tH\x00\x12\x12\n\x08politics\x18\x07 \x01(\tH\x00\x42\x06\n\x04typeb\x06proto3'
-  ,
-  dependencies=[google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
+  serialized_pb=b'\n\rArticle.proto\"1\n\x04\x44\x61te\x12\x0c\n\x04\x64\x61te\x18\x01 \x01(\x05\x12\r\n\x05month\x18\x02 \x01(\t\x12\x0c\n\x04year\x18\x03 \x01(\x05\"\x8c\x01\n\x07\x41rticle\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0e\n\x06\x61uthor\x18\x02 \x01(\t\x12\x13\n\x04time\x18\x03 \x01(\x0b\x32\x05.Date\x12\x0f\n\x07\x63ontent\x18\x04 \x01(\t\x12\x10\n\x06sports\x18\x05 \x01(\tH\x00\x12\x11\n\x07\x66\x61shion\x18\x06 \x01(\tH\x00\x12\x12\n\x08politics\x18\x07 \x01(\tH\x00\x42\x06\n\x04typeb\x06proto3'
+)
 
 
+
+
+_DATE = _descriptor.Descriptor(
+  name='Date',
+  full_name='Date',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='date', full_name='Date.date', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='month', full_name='Date.month', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='year', full_name='Date.year', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=17,
+  serialized_end=66,
+)
 
 
 _ARTICLE = _descriptor.Descriptor(
@@ -101,11 +145,11 @@ _ARTICLE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=51,
-  serialized_end=212,
+  serialized_start=69,
+  serialized_end=209,
 )
 
-_ARTICLE.fields_by_name['time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
+_ARTICLE.fields_by_name['time'].message_type = _DATE
 _ARTICLE.oneofs_by_name['type'].fields.append(
   _ARTICLE.fields_by_name['sports'])
 _ARTICLE.fields_by_name['sports'].containing_oneof = _ARTICLE.oneofs_by_name['type']
@@ -115,8 +159,16 @@ _ARTICLE.fields_by_name['fashion'].containing_oneof = _ARTICLE.oneofs_by_name['t
 _ARTICLE.oneofs_by_name['type'].fields.append(
   _ARTICLE.fields_by_name['politics'])
 _ARTICLE.fields_by_name['politics'].containing_oneof = _ARTICLE.oneofs_by_name['type']
+DESCRIPTOR.message_types_by_name['Date'] = _DATE
 DESCRIPTOR.message_types_by_name['Article'] = _ARTICLE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+Date = _reflection.GeneratedProtocolMessageType('Date', (_message.Message,), {
+  'DESCRIPTOR' : _DATE,
+  '__module__' : 'Article_pb2'
+  # @@protoc_insertion_point(class_scope:Date)
+  })
+_sym_db.RegisterMessage(Date)
 
 Article = _reflection.GeneratedProtocolMessageType('Article', (_message.Message,), {
   'DESCRIPTOR' : _ARTICLE,
