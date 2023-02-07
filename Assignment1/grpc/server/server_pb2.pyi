@@ -1,4 +1,3 @@
-from protos.Client import Client_pb2 as _Client_pb2
 from protos.Article import Article_pb2 as _Article_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -9,16 +8,16 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class GetArticlesRequest(_message.Message):
-    __slots__ = ["author", "client", "date", "type"]
+    __slots__ = ["author", "client_id", "date", "type"]
     AUTHOR_FIELD_NUMBER: _ClassVar[int]
-    CLIENT_FIELD_NUMBER: _ClassVar[int]
+    CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
     DATE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     author: str
-    client: _Client_pb2.Client
+    client_id: int
     date: _Article_pb2.Date
     type: str
-    def __init__(self, client: _Optional[_Union[_Client_pb2.Client, _Mapping]] = ..., type: _Optional[str] = ..., author: _Optional[str] = ..., date: _Optional[_Union[_Article_pb2.Date, _Mapping]] = ...) -> None: ...
+    def __init__(self, client_id: _Optional[int] = ..., type: _Optional[str] = ..., author: _Optional[str] = ..., date: _Optional[_Union[_Article_pb2.Date, _Mapping]] = ...) -> None: ...
 
 class GetArticlesResponse(_message.Message):
     __slots__ = ["article_list"]
@@ -27,12 +26,12 @@ class GetArticlesResponse(_message.Message):
     def __init__(self, article_list: _Optional[_Iterable[_Union[_Article_pb2.Article, _Mapping]]] = ...) -> None: ...
 
 class PublishArticleRequest(_message.Message):
-    __slots__ = ["article", "client"]
+    __slots__ = ["article", "client_id"]
     ARTICLE_FIELD_NUMBER: _ClassVar[int]
-    CLIENT_FIELD_NUMBER: _ClassVar[int]
+    CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
     article: _Article_pb2.Article
-    client: _Client_pb2.Client
-    def __init__(self, client: _Optional[_Union[_Client_pb2.Client, _Mapping]] = ..., article: _Optional[_Union[_Article_pb2.Article, _Mapping]] = ...) -> None: ...
+    client_id: int
+    def __init__(self, client_id: _Optional[int] = ..., article: _Optional[_Union[_Article_pb2.Article, _Mapping]] = ...) -> None: ...
 
 class PublishArticleResponse(_message.Message):
     __slots__ = ["status"]

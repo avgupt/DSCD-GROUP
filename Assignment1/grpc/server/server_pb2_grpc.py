@@ -2,10 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from grpc.server import server_pb2 as grpc_dot_server_dot_server__pb2
+import server_pb2 as grpc_dot_server_dot_server__pb2
 
 
-class ServerStub(object):
+class ClientServerStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -15,18 +15,18 @@ class ServerStub(object):
             channel: A grpc.Channel.
         """
         self.GetArticles = channel.unary_unary(
-                '/Server/GetArticles',
+                '/ClientServer/GetArticles',
                 request_serializer=grpc_dot_server_dot_server__pb2.GetArticlesRequest.SerializeToString,
                 response_deserializer=grpc_dot_server_dot_server__pb2.GetArticlesResponse.FromString,
                 )
         self.PublishArticle = channel.unary_unary(
-                '/Server/PublishArticle',
+                '/ClientServer/PublishArticle',
                 request_serializer=grpc_dot_server_dot_server__pb2.PublishArticleRequest.SerializeToString,
                 response_deserializer=grpc_dot_server_dot_server__pb2.PublishArticleResponse.FromString,
                 )
 
 
-class ServerServicer(object):
+class ClientServerServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def GetArticles(self, request, context):
@@ -42,7 +42,7 @@ class ServerServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_ServerServicer_to_server(servicer, server):
+def add_ClientServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetArticles': grpc.unary_unary_rpc_method_handler(
                     servicer.GetArticles,
@@ -56,12 +56,12 @@ def add_ServerServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'Server', rpc_method_handlers)
+            'ClientServer', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class Server(object):
+class ClientServer(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -75,7 +75,7 @@ class Server(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/Server/GetArticles',
+        return grpc.experimental.unary_unary(request, target, '/ClientServer/GetArticles',
             grpc_dot_server_dot_server__pb2.GetArticlesRequest.SerializeToString,
             grpc_dot_server_dot_server__pb2.GetArticlesResponse.FromString,
             options, channel_credentials,
@@ -92,7 +92,7 @@ class Server(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/Server/PublishArticle',
+        return grpc.experimental.unary_unary(request, target, '/ClientServer/PublishArticle',
             grpc_dot_server_dot_server__pb2.PublishArticleRequest.SerializeToString,
             grpc_dot_server_dot_server__pb2.PublishArticleResponse.FromString,
             options, channel_credentials,

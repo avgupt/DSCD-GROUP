@@ -11,27 +11,26 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from protos.Client import Client_pb2 as protos_dot_Client_dot_Client__pb2
 from protos.Article import Article_pb2 as protos_dot_Article_dot_Article__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18grpc/server/server.proto\x1a\x1aprotos/Client/Client.proto\x1a\x1cprotos/Article/Article.proto\"`\n\x12GetArticlesRequest\x12\x17\n\x06\x63lient\x18\x01 \x01(\x0b\x32\x07.Client\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x03 \x01(\t\x12\x13\n\x04\x64\x61te\x18\x04 \x01(\x0b\x32\x05.Date\"5\n\x13GetArticlesResponse\x12\x1e\n\x0c\x61rticle_list\x18\x01 \x03(\x0b\x32\x08.Article\"K\n\x15PublishArticleRequest\x12\x17\n\x06\x63lient\x18\x01 \x01(\x0b\x32\x07.Client\x12\x19\n\x07\x61rticle\x18\x02 \x01(\x0b\x32\x08.Article\"k\n\x16PublishArticleResponse\x12.\n\x06status\x18\x01 \x01(\x0e\x32\x1e.PublishArticleResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x32\x85\x01\n\x06Server\x12\x38\n\x0bGetArticles\x12\x13.GetArticlesRequest\x1a\x14.GetArticlesResponse\x12\x41\n\x0ePublishArticle\x12\x16.PublishArticleRequest\x1a\x17.PublishArticleResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18grpc/server/server.proto\x1a\x1cprotos/Article/Article.proto\"Z\n\x12GetArticlesRequest\x12\x11\n\tclient_id\x18\x01 \x01(\x05\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x03 \x01(\t\x12\x13\n\x04\x64\x61te\x18\x04 \x01(\x0b\x32\x05.Date\"5\n\x13GetArticlesResponse\x12\x1e\n\x0c\x61rticle_list\x18\x01 \x03(\x0b\x32\x08.Article\"E\n\x15PublishArticleRequest\x12\x11\n\tclient_id\x18\x01 \x01(\x05\x12\x19\n\x07\x61rticle\x18\x02 \x01(\x0b\x32\x08.Article\"k\n\x16PublishArticleResponse\x12.\n\x06status\x18\x01 \x01(\x0e\x32\x1e.PublishArticleResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x32\x8b\x01\n\x0c\x43lientServer\x12\x38\n\x0bGetArticles\x12\x13.GetArticlesRequest\x1a\x14.GetArticlesResponse\x12\x41\n\x0ePublishArticle\x12\x16.PublishArticleRequest\x1a\x17.PublishArticleResponseb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'grpc.server.server_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _GETARTICLESREQUEST._serialized_start=86
-  _GETARTICLESREQUEST._serialized_end=182
-  _GETARTICLESRESPONSE._serialized_start=184
-  _GETARTICLESRESPONSE._serialized_end=237
-  _PUBLISHARTICLEREQUEST._serialized_start=239
-  _PUBLISHARTICLEREQUEST._serialized_end=314
-  _PUBLISHARTICLERESPONSE._serialized_start=316
-  _PUBLISHARTICLERESPONSE._serialized_end=423
-  _PUBLISHARTICLERESPONSE_STATUS._serialized_start=390
-  _PUBLISHARTICLERESPONSE_STATUS._serialized_end=423
-  _SERVER._serialized_start=426
-  _SERVER._serialized_end=559
+  _GETARTICLESREQUEST._serialized_start=58
+  _GETARTICLESREQUEST._serialized_end=148
+  _GETARTICLESRESPONSE._serialized_start=150
+  _GETARTICLESRESPONSE._serialized_end=203
+  _PUBLISHARTICLEREQUEST._serialized_start=205
+  _PUBLISHARTICLEREQUEST._serialized_end=274
+  _PUBLISHARTICLERESPONSE._serialized_start=276
+  _PUBLISHARTICLERESPONSE._serialized_end=383
+  _PUBLISHARTICLERESPONSE_STATUS._serialized_start=350
+  _PUBLISHARTICLERESPONSE_STATUS._serialized_end=383
+  _CLIENTSERVER._serialized_start=386
+  _CLIENTSERVER._serialized_end=525
 # @@protoc_insertion_point(module_scope)
