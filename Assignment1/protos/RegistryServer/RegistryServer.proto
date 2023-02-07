@@ -1,23 +1,6 @@
 syntax = "proto3";
 
-enum Status {
-    FAILED = 0;
-    SUCCESS = 1;
-  }
-
 message RegistryServer {
     map<string, string> servers = 1;
     int32 MAX_SERVERS = 2;
-  }
-
-service RegistryServerService {
-    rpc RegisterServer (RegisterServerRequest) returns (RegisterServerResponse) {}
-  }
-
-message RegisterServerRequest {
-    string server_name = 1;
-  }
-
-message RegisterServerResponse {
-    Status status = 1;
   }

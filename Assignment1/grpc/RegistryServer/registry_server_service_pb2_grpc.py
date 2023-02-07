@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import RegistryServer_pb2 as RegistryServer__pb2
+import registry_server_service_pb2 as registry__server__service__pb2
 
 
 class RegistryServerServiceStub(object):
@@ -16,8 +16,8 @@ class RegistryServerServiceStub(object):
         """
         self.RegisterServer = channel.unary_unary(
                 '/RegistryServerService/RegisterServer',
-                request_serializer=RegistryServer__pb2.RegisterServerRequest.SerializeToString,
-                response_deserializer=RegistryServer__pb2.RegisterServerResponse.FromString,
+                request_serializer=registry__server__service__pb2.RegisterServerRequest.SerializeToString,
+                response_deserializer=registry__server__service__pb2.RegisterServerResponse.FromString,
                 )
 
 
@@ -35,8 +35,8 @@ def add_RegistryServerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'RegisterServer': grpc.unary_unary_rpc_method_handler(
                     servicer.RegisterServer,
-                    request_deserializer=RegistryServer__pb2.RegisterServerRequest.FromString,
-                    response_serializer=RegistryServer__pb2.RegisterServerResponse.SerializeToString,
+                    request_deserializer=registry__server__service__pb2.RegisterServerRequest.FromString,
+                    response_serializer=registry__server__service__pb2.RegisterServerResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -60,7 +60,7 @@ class RegistryServerService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/RegistryServerService/RegisterServer',
-            RegistryServer__pb2.RegisterServerRequest.SerializeToString,
-            RegistryServer__pb2.RegisterServerResponse.FromString,
+            registry__server__service__pb2.RegisterServerRequest.SerializeToString,
+            registry__server__service__pb2.RegisterServerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
