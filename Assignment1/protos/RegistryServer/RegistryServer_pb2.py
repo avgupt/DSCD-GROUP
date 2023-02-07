@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14RegistryServer.proto\"\x84\x01\n\x0eRegistryServer\x12-\n\x07servers\x18\x01 \x03(\x0b\x32\x1c.RegistryServer.ServersEntry\x12\x13\n\x0bMAX_SERVERS\x18\x02 \x01(\x05\x1a.\n\x0cServersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\",\n\x15RegisterServerRequest\x12\x13\n\x0bserver_name\x18\x01 \x01(\t\"1\n\x16RegisterServerResponse\x12\x17\n\x06status\x18\x01 \x01(\x0e\x32\x07.Status*!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x32\\\n\x15RegistryServerService\x12\x43\n\x0eRegisterServer\x12\x16.RegisterServerRequest\x1a\x17.RegisterServerResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14RegistryServer.proto\"\x84\x01\n\x0eRegistryServer\x12-\n\x07servers\x18\x01 \x03(\x0b\x32\x1c.RegistryServer.ServersEntry\x12\x13\n\x0bmax_servers\x18\x02 \x01(\x05\x1a.\n\x0cServersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'RegistryServer_pb2', globals())
@@ -22,16 +22,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   _REGISTRYSERVER_SERVERSENTRY._options = None
   _REGISTRYSERVER_SERVERSENTRY._serialized_options = b'8\001'
-  _STATUS._serialized_start=256
-  _STATUS._serialized_end=289
   _REGISTRYSERVER._serialized_start=25
   _REGISTRYSERVER._serialized_end=157
   _REGISTRYSERVER_SERVERSENTRY._serialized_start=111
   _REGISTRYSERVER_SERVERSENTRY._serialized_end=157
-  _REGISTERSERVERREQUEST._serialized_start=159
-  _REGISTERSERVERREQUEST._serialized_end=203
-  _REGISTERSERVERRESPONSE._serialized_start=205
-  _REGISTERSERVERRESPONSE._serialized_end=254
-  _REGISTRYSERVERSERVICE._serialized_start=291
-  _REGISTRYSERVERSERVICE._serialized_end=383
 # @@protoc_insertion_point(module_scope)
