@@ -15,7 +15,7 @@ def run():
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
         
-        response = stub.RegisterServer(registry_server_service_pb2 .RegisterServerRequest(server_name='yoyo'))
+        response = stub.RegisterServer(registry_server_service_pb2 .RegisterServerRequest(server_name='yoyo1',ip='localhost',port=1000))
     print("Registry Server client received: " + str(response.status))
 
 

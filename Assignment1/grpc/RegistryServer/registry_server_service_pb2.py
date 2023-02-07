@@ -13,19 +13,19 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1dregistry_server_service.proto\",\n\x15RegisterServerRequest\x12\x13\n\x0bserver_name\x18\x01 \x01(\t\"1\n\x16RegisterServerResponse\x12\x17\n\x06status\x18\x01 \x01(\x0e\x32\x07.Status*!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x32\\\n\x15RegistryServerService\x12\x43\n\x0eRegisterServer\x12\x16.RegisterServerRequest\x1a\x17.RegisterServerResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1dregistry_server_service.proto\"F\n\x15RegisterServerRequest\x12\x13\n\x0bserver_name\x18\x01 \x01(\t\x12\n\n\x02ip\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\"1\n\x16RegisterServerResponse\x12\x17\n\x06status\x18\x01 \x01(\x0e\x32\x07.Status*!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x32\\\n\x15RegistryServerService\x12\x43\n\x0eRegisterServer\x12\x16.RegisterServerRequest\x1a\x17.RegisterServerResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'registry_server_service_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _STATUS._serialized_start=130
-  _STATUS._serialized_end=163
+  _STATUS._serialized_start=156
+  _STATUS._serialized_end=189
   _REGISTERSERVERREQUEST._serialized_start=33
-  _REGISTERSERVERREQUEST._serialized_end=77
-  _REGISTERSERVERRESPONSE._serialized_start=79
-  _REGISTERSERVERRESPONSE._serialized_end=128
-  _REGISTRYSERVERSERVICE._serialized_start=165
-  _REGISTRYSERVERSERVICE._serialized_end=257
+  _REGISTERSERVERREQUEST._serialized_end=103
+  _REGISTERSERVERRESPONSE._serialized_start=105
+  _REGISTERSERVERRESPONSE._serialized_end=154
+  _REGISTRYSERVERSERVICE._serialized_start=191
+  _REGISTRYSERVERSERVICE._serialized_end=283
 # @@protoc_insertion_point(module_scope)
