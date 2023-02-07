@@ -2,10 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from grpc.server import server_service_pb2 as grpc_dot_server_dot_server__service__pb2
+from grpc.server import server_pb2 as grpc_dot_server_dot_server__pb2
 
 
-class ServerServiceStub(object):
+class ServerStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -15,18 +15,18 @@ class ServerServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GetArticles = channel.unary_unary(
-                '/ServerService/GetArticles',
-                request_serializer=grpc_dot_server_dot_server__service__pb2.GetArticlesRequest.SerializeToString,
-                response_deserializer=grpc_dot_server_dot_server__service__pb2.GetArticlesResponse.FromString,
+                '/Server/GetArticles',
+                request_serializer=grpc_dot_server_dot_server__pb2.GetArticlesRequest.SerializeToString,
+                response_deserializer=grpc_dot_server_dot_server__pb2.GetArticlesResponse.FromString,
                 )
         self.PublishArticle = channel.unary_unary(
-                '/ServerService/PublishArticle',
-                request_serializer=grpc_dot_server_dot_server__service__pb2.PublishArticleRequest.SerializeToString,
-                response_deserializer=grpc_dot_server_dot_server__service__pb2.PublishArticleResponse.FromString,
+                '/Server/PublishArticle',
+                request_serializer=grpc_dot_server_dot_server__pb2.PublishArticleRequest.SerializeToString,
+                response_deserializer=grpc_dot_server_dot_server__pb2.PublishArticleResponse.FromString,
                 )
 
 
-class ServerServiceServicer(object):
+class ServerServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def GetArticles(self, request, context):
@@ -42,26 +42,26 @@ class ServerServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_ServerServiceServicer_to_server(servicer, server):
+def add_ServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetArticles': grpc.unary_unary_rpc_method_handler(
                     servicer.GetArticles,
-                    request_deserializer=grpc_dot_server_dot_server__service__pb2.GetArticlesRequest.FromString,
-                    response_serializer=grpc_dot_server_dot_server__service__pb2.GetArticlesResponse.SerializeToString,
+                    request_deserializer=grpc_dot_server_dot_server__pb2.GetArticlesRequest.FromString,
+                    response_serializer=grpc_dot_server_dot_server__pb2.GetArticlesResponse.SerializeToString,
             ),
             'PublishArticle': grpc.unary_unary_rpc_method_handler(
                     servicer.PublishArticle,
-                    request_deserializer=grpc_dot_server_dot_server__service__pb2.PublishArticleRequest.FromString,
-                    response_serializer=grpc_dot_server_dot_server__service__pb2.PublishArticleResponse.SerializeToString,
+                    request_deserializer=grpc_dot_server_dot_server__pb2.PublishArticleRequest.FromString,
+                    response_serializer=grpc_dot_server_dot_server__pb2.PublishArticleResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'ServerService', rpc_method_handlers)
+            'Server', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class ServerService(object):
+class Server(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -75,9 +75,9 @@ class ServerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerService/GetArticles',
-            grpc_dot_server_dot_server__service__pb2.GetArticlesRequest.SerializeToString,
-            grpc_dot_server_dot_server__service__pb2.GetArticlesResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/Server/GetArticles',
+            grpc_dot_server_dot_server__pb2.GetArticlesRequest.SerializeToString,
+            grpc_dot_server_dot_server__pb2.GetArticlesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -92,8 +92,8 @@ class ServerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerService/PublishArticle',
-            grpc_dot_server_dot_server__service__pb2.PublishArticleRequest.SerializeToString,
-            grpc_dot_server_dot_server__service__pb2.PublishArticleResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/Server/PublishArticle',
+            grpc_dot_server_dot_server__pb2.PublishArticleRequest.SerializeToString,
+            grpc_dot_server_dot_server__pb2.PublishArticleResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

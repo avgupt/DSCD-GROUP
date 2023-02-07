@@ -31,7 +31,7 @@ message PublishArticleResponse {
     Status status = 1;
 }
 
-service ServerService {
+service Server {
     rpc GetArticles (GetArticlesRequest) returns (GetArticlesResponse);
     rpc PublishArticle (PublishArticleRequest) returns (PublishArticleResponse);
 }
