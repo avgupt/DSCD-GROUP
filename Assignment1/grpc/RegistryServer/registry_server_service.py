@@ -22,6 +22,9 @@ class RegisterService(registry_server_service_pb2_grpc.RegistryServerServiceServ
             return registry_server_service_pb2.RegisterServerResponse(status=registry_server_service_pb2.Status.SUCCESS)
         return registry_server_service_pb2.RegisterServerResponse(status=registry_server_service_pb2.Status.FAILED)
 
+    def GetServerList(self, request, context):
+        return registry_server_service_pb2.GetServerListResponse(servers=servers)
+
 
 def serve():
     port = '50051'

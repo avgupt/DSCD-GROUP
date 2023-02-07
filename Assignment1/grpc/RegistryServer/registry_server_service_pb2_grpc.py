@@ -19,12 +19,23 @@ class RegistryServerServiceStub(object):
                 request_serializer=registry__server__service__pb2.RegisterServerRequest.SerializeToString,
                 response_deserializer=registry__server__service__pb2.RegisterServerResponse.FromString,
                 )
+        self.GetServerList = channel.unary_unary(
+                '/RegistryServerService/GetServerList',
+                request_serializer=registry__server__service__pb2.GetServerListRequest.SerializeToString,
+                response_deserializer=registry__server__service__pb2.GetServerListResponse.FromString,
+                )
 
 
 class RegistryServerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def RegisterServer(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetServerList(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -37,6 +48,11 @@ def add_RegistryServerServiceServicer_to_server(servicer, server):
                     servicer.RegisterServer,
                     request_deserializer=registry__server__service__pb2.RegisterServerRequest.FromString,
                     response_serializer=registry__server__service__pb2.RegisterServerResponse.SerializeToString,
+            ),
+            'GetServerList': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetServerList,
+                    request_deserializer=registry__server__service__pb2.GetServerListRequest.FromString,
+                    response_serializer=registry__server__service__pb2.GetServerListResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -62,5 +78,22 @@ class RegistryServerService(object):
         return grpc.experimental.unary_unary(request, target, '/RegistryServerService/RegisterServer',
             registry__server__service__pb2.RegisterServerRequest.SerializeToString,
             registry__server__service__pb2.RegisterServerResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetServerList(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/RegistryServerService/GetServerList',
+            registry__server__service__pb2.GetServerListRequest.SerializeToString,
+            registry__server__service__pb2.GetServerListResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
