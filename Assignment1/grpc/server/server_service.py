@@ -47,6 +47,14 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
             filtered = self.filterArticles(request.date)
 
         return server_pb2.GetArticlesResponse(article_list=filtered)
+    
+    def PublishArticle(self, request, context):
+        if request.client_id not in clientele:
+            context.cancel()
+            return server_pb2.PublishArticleResponse(server_pb2.PublishArticleResponse.Status.FAILED)
+        
+        hosted_articles.append(request.article)
+        return server_pb2.PublishArticleResponse(server_pb2.PublishArticleResponse.Status.SUCCESS)
 
 class Server:
 
