@@ -2,5 +2,4 @@ syntax = "proto3";
 
 message RegistryServer {
     map<string, string> servers = 1;
-    int32 max_servers = 2;
   }
