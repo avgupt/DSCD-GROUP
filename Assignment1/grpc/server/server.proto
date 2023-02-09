@@ -3,7 +3,7 @@ syntax = "proto3";
 import "protos/Article/Article.proto";
 
 message GetArticlesRequest {
-    int32 client_id = 1;
+    string client_uuid = 1;
 
     // article info:
     string type = 2;
@@ -16,7 +16,7 @@ message GetArticlesResponse {
 }
 
 message PublishArticleRequest {
-    int32 client_id = 1;
+    string client_uuid = 1;
     Article article = 2;
 }
 
@@ -29,7 +29,40 @@ message PublishArticleResponse {
     Status status = 1;
 }
 
+// JoinServer Messages;
+
+message ServerJoinRequest {
+    string client_uuid = 1;
+}
+
+message ServerJoinResponse {
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+    
+    Status status = 1;
+}
+
+// LeaveServer Messages
+message ServerLeaveRequest {
+    string client_uuid = 1;
+}
+
+message ServerLeaveResponse {
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+    
+    Status status = 1;
+}
+
 service ClientServer {
     rpc GetArticles (GetArticlesRequest) returns (GetArticlesResponse);
     rpc PublishArticle (PublishArticleRequest) returns (PublishArticleResponse);
+
+    // Manvi RPCs
+    rpc JoinServer (ServerJoinRequest) returns (ServerJoinResponse);
+    rpc LeaveServer (ServerLeaveRequest) returns (ServerLeaveResponse);
 }

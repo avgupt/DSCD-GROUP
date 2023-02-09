@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 from protos.Article import Article_pb2 as protos_dot_Article_dot_Article__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18grpc/server/server.proto\x1a\x1cprotos/Article/Article.proto\"Z\n\x12GetArticlesRequest\x12\x11\n\tclient_id\x18\x01 \x01(\x05\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x03 \x01(\t\x12\x13\n\x04\x64\x61te\x18\x04 \x01(\x0b\x32\x05.Date\"5\n\x13GetArticlesResponse\x12\x1e\n\x0c\x61rticle_list\x18\x01 \x03(\x0b\x32\x08.Article\"E\n\x15PublishArticleRequest\x12\x11\n\tclient_id\x18\x01 \x01(\x05\x12\x19\n\x07\x61rticle\x18\x02 \x01(\x0b\x32\x08.Article\"k\n\x16PublishArticleResponse\x12.\n\x06status\x18\x01 \x01(\x0e\x32\x1e.PublishArticleResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x32\x8b\x01\n\x0c\x43lientServer\x12\x38\n\x0bGetArticles\x12\x13.GetArticlesRequest\x1a\x14.GetArticlesResponse\x12\x41\n\x0ePublishArticle\x12\x16.PublishArticleRequest\x1a\x17.PublishArticleResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18grpc/server/server.proto\x1a\x1cprotos/Article/Article.proto\"\\\n\x12GetArticlesRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x03 \x01(\t\x12\x13\n\x04\x64\x61te\x18\x04 \x01(\x0b\x32\x05.Date\"5\n\x13GetArticlesResponse\x12\x1e\n\x0c\x61rticle_list\x18\x01 \x03(\x0b\x32\x08.Article\"G\n\x15PublishArticleRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\x12\x19\n\x07\x61rticle\x18\x02 \x01(\x0b\x32\x08.Article\"k\n\x16PublishArticleResponse\x12.\n\x06status\x18\x01 \x01(\x0e\x32\x1e.PublishArticleResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\"(\n\x11ServerJoinRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\"c\n\x12ServerJoinResponse\x12*\n\x06status\x18\x01 \x01(\x0e\x32\x1a.ServerJoinResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\")\n\x12ServerLeaveRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\"e\n\x13ServerLeaveResponse\x12+\n\x06status\x18\x01 \x01(\x0e\x32\x1b.ServerLeaveResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x32\xfc\x01\n\x0c\x43lientServer\x12\x38\n\x0bGetArticles\x12\x13.GetArticlesRequest\x1a\x14.GetArticlesResponse\x12\x41\n\x0ePublishArticle\x12\x16.PublishArticleRequest\x1a\x17.PublishArticleResponse\x12\x35\n\nJoinServer\x12\x12.ServerJoinRequest\x1a\x13.ServerJoinResponse\x12\x38\n\x0bLeaveServer\x12\x13.ServerLeaveRequest\x1a\x14.ServerLeaveResponseb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'grpc.server.server_pb2', globals())
@@ -22,15 +22,27 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _GETARTICLESREQUEST._serialized_start=58
-  _GETARTICLESREQUEST._serialized_end=148
-  _GETARTICLESRESPONSE._serialized_start=150
-  _GETARTICLESRESPONSE._serialized_end=203
-  _PUBLISHARTICLEREQUEST._serialized_start=205
-  _PUBLISHARTICLEREQUEST._serialized_end=274
-  _PUBLISHARTICLERESPONSE._serialized_start=276
-  _PUBLISHARTICLERESPONSE._serialized_end=383
-  _PUBLISHARTICLERESPONSE_STATUS._serialized_start=350
-  _PUBLISHARTICLERESPONSE_STATUS._serialized_end=383
-  _CLIENTSERVER._serialized_start=386
-  _CLIENTSERVER._serialized_end=525
+  _GETARTICLESREQUEST._serialized_end=150
+  _GETARTICLESRESPONSE._serialized_start=152
+  _GETARTICLESRESPONSE._serialized_end=205
+  _PUBLISHARTICLEREQUEST._serialized_start=207
+  _PUBLISHARTICLEREQUEST._serialized_end=278
+  _PUBLISHARTICLERESPONSE._serialized_start=280
+  _PUBLISHARTICLERESPONSE._serialized_end=387
+  _PUBLISHARTICLERESPONSE_STATUS._serialized_start=354
+  _PUBLISHARTICLERESPONSE_STATUS._serialized_end=387
+  _SERVERJOINREQUEST._serialized_start=389
+  _SERVERJOINREQUEST._serialized_end=429
+  _SERVERJOINRESPONSE._serialized_start=431
+  _SERVERJOINRESPONSE._serialized_end=530
+  _SERVERJOINRESPONSE_STATUS._serialized_start=354
+  _SERVERJOINRESPONSE_STATUS._serialized_end=387
+  _SERVERLEAVEREQUEST._serialized_start=532
+  _SERVERLEAVEREQUEST._serialized_end=573
+  _SERVERLEAVERESPONSE._serialized_start=575
+  _SERVERLEAVERESPONSE._serialized_end=676
+  _SERVERLEAVERESPONSE_STATUS._serialized_start=354
+  _SERVERLEAVERESPONSE_STATUS._serialized_end=387
+  _CLIENTSERVER._serialized_start=679
+  _CLIENTSERVER._serialized_end=931
 # @@protoc_insertion_point(module_scope)

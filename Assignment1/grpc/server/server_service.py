@@ -7,6 +7,7 @@ import server_pb2, server_pb2_grpc
 hosted_articles = []
 subscribers = []
 clientele = []
+max_clients = 2
 
 class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
 
@@ -55,6 +56,32 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
         
         hosted_articles.append(request.article)
         return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.SUCCESS)
+    
+    def JoinServer(self, request, context):
+        # Assuming unique UUID for client.
+        client_uuid = request.client_uuid
+        print("JOIN REQUEST FROM", client_uuid)
+        
+        if len(clientele) < max_clients:
+            clientele.append(client_uuid)
+            # Success: client accepted and added to clientale.
+            return server_pb2.ServerJoinResponse(status=server_pb2.ServerJoinResponse.Status.SUCCESS)
+        
+        # Failure: Client not added to the clientale list
+        return server_pb2.ServerJoinResponse(status=server_pb2.ServerJoinResponse.Status.FAILED)
+    
+    def LeaveServer(self, request, context):
+        # Assuming unique UUID for client
+        client_uuid = request.client_uuid
+        print("LEAVE REQUEST FROM", client_uuid)
+        
+        if (client_uuid in clientele):
+            clientele.remove(client_uuid)
+            return server_pb2.ServerLeaveResponse(status=server_pb2.ServerLeaveResponse.Status.SUCCESS)
+
+        return server_pb2.ServerLeaveResponse(status=server_pb2.ServerLeaveResponse.Status.FAILED)
+
+
 
 class Server:
 

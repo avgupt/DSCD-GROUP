@@ -1,4 +1,5 @@
 import grpc
+import uuid
 
 import server_pb2 as server_pb2
 import server_pb2_grpc as server_pb2_grpc
@@ -17,34 +18,55 @@ sample_article_4 = Article(id=4, author="Jan", time=sample_date_4, content="hell
 
 class Client:
 
-    def __init__(self, id):
-        self.id = id
-        self.start()
+    def __init__(self):
+        uuid_string = str(uuid.uuid1())
+        # self.id = id
+        self.id = uuid_string
+        # self.start()
     
-    def connectToServer(self, server_port):
-        # TODO(manvi): connect to mentioned server
-        pass
+    # We have the server_address using the name of the server. 
+    def connectToServer(self, server_address):
+        with grpc.insecure_channel(server_address) as channel:
+            stub = server_pb2_grpc.ClientServerStub(channel)
+
+            response = stub.JoinServer(server_pb2.ServerJoinRequest(client_uuid=self.id))
+            # print("Something", type(response))
+            print(response)
+            channel.close()
+
+    def leaveServer(self, server_address):
+        with grpc.insecure_channel(server_address) as channel:
+            stub = server_pb2_grpc.ClientServerStub(channel)
+
+            response = stub.LeaveServer(server_pb2.ServerLeaveRequest(client_uuid=self.id))
+            # print("Something", type(response))
+            print(response)
+            channel.close()
 
     def start(self):
         # TODO(avishi): Refactor code
         # Reference: www.tutorialspoint.com/grpc/grpc_helloworld_app_with_python.htm
         print(self.id)
-        with grpc.insecure_channel('localhost:5005' , options=(('grpc.enable_http_proxy', 0),)) as channel:
+        with grpc.insecure_channel('localhost:8080' , options=(('grpc.enable_http_proxy', 0),)) as channel:
             stub = server_pb2_grpc.ClientServerStub(channel)
-            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_id=self.id, article=sample_article_1))
+            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_1))
             print(response)
-            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_id=self.id, article=sample_article_2))
+            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_2))
             print(response)
-            response = stub.GetArticles(server_pb2.GetArticlesRequest(client_id=self.id, date=sample_date_2))
+            response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id, date=sample_date_2))
             print(response)
-            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_id=self.id, article=sample_article_3))
-            response = stub.GetArticles(server_pb2.GetArticlesRequest(client_id=self.id, date=sample_date_1))
+            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_3))
+            response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id, date=sample_date_1))
             print(response)
             channel.close()
 
 if __name__ == "__main__":
-    myClient1 = Client(11)
+    myClient1 = Client()
+    # name input - path
+    myClient1.connectToServer('localhost:8080')
+
     myClient1.start()
 
-    myClient2 = Client(22)
-    myClient2.start()
+    # myClient2 = Client()
+    # # myClient2.connectToServer('localhost:8080')
+    # myClient2.leaveServer('localhost:8080')
