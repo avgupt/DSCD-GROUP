@@ -3,10 +3,11 @@ from __future__ import print_function
 import grpc
 import uuid
 
-import server_pb2 as server_pb2
-import server_pb2_grpc as server_pb2_grpc
 
-from protos.Article.Article_pb2 import Article, Date
+import server.server_pb2 as server_pb2
+import server.server_pb2_grpc as server_pb2_grpc
+
+from server.protos.Article.Article_pb2 import Article, Date
 
 import logging
 import RegistryServer.registry_server_service_pb2 as registry_server_service_pb2
@@ -27,38 +28,49 @@ class Client:
 
     def __init__(self):
         uuid_string = str(uuid.uuid1())
-        # self.id = id
         self.id = uuid_string
-        self.run()
+        
 
-        # self.start()
-    
-    def startRegistryServer():
-        print("Will try to register to registry server ...")
+    # RPC from client to Registry server
+    def getServerListFromRegistryServer(self):
         with grpc.insecure_channel('localhost:50051') as channel:
             stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
-    
-        # response = stub.RegisterServer(registry_server_service_pb2.RegisterServerRequest(server_name='yoyo1',ip='localhost',port=1000))
-    
+            response = stub.GetServerList(registry_server_service_pb2.GetServerListRequest())
+            print(response)
+            channel.close()
+            return response
 
     # We have the server_address using the name of the server. 
-    def connectToServer(self, server_address):
+    def connectToServer(self, server_name):
+        server_list = self.getServerListFromRegistryServer()
+        server_address = server_list[server_name]
         with grpc.insecure_channel(server_address) as channel:
             stub = server_pb2_grpc.ClientServerStub(channel)
-
             response = stub.JoinServer(server_pb2.ServerJoinRequest(client_uuid=self.id))
-            # print("Something", type(response))
             print(response)
             channel.close()
 
-    def leaveServer(self, server_address):
+    def leaveServer(self, server_name):
+        server_list = self.getServerListFromRegistryServer()
+        server_address = server_list[server_name]
         with grpc.insecure_channel(server_address) as channel:
             stub = server_pb2_grpc.ClientServerStub(channel)
-
             response = stub.LeaveServer(server_pb2.ServerLeaveRequest(client_uuid=self.id))
-            # print("Something", type(response))
             print(response)
             channel.close()
+
+    def publishArticle(self, sample_article, server_name):
+        server_list = self.getServerListFromRegistryServer()
+        server_address = server_list[server_name]
+        
+        with grpc.insecure_channel(server_address , options=(('grpc.enable_http_proxy', 0),)) as channel:
+            stub = server_pb2_grpc.ClientServerStub(channel)
+            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article))
+            print(response)
+            channel.close()
+    
+    # def getArticles(self, type=None)
+        
 
     def start(self, server_address):
         # TODO(avishi): Refactor code
@@ -66,18 +78,16 @@ class Client:
         print(self.id)
         with grpc.insecure_channel(server_address , options=(('grpc.enable_http_proxy', 0),)) as channel:
             stub = server_pb2_grpc.ClientServerStub(channel)
-            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_1))
+            # response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_1))
+            # print(response)
+            # response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_2))
+            # # print(response)
+            response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id))
             print(response)
-            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_2))
-            print(response)
-            response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id, date=sample_date_2))
-            print(response)
-            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_3))
-            response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id, date=sample_date_1))
-            print(response)
+            # response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_3))
+            # response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id, date=sample_date_1))
+            # print(response)
             channel.close()
-
-    def initiate():
 
 
 if __name__ == "__main__":

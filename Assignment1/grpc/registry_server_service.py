@@ -2,8 +2,8 @@ from concurrent import futures
 import logging
 
 import grpc
-import registry_server_service_pb2 
-import registry_server_service_pb2_grpc
+import GeneratedFiles.registry_server_service_pb2 as registry_server_service_pb2 
+import GeneratedFiles.registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
 
 max_servers = 2

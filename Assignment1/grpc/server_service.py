@@ -2,7 +2,8 @@ from concurrent import futures
 import logging
 
 import grpc
-import server_pb2, server_pb2_grpc
+import GeneratedFiles.server_service_pb2 as server_pb2
+import GeneratedFiles.server_service_pb2_grpc as server_pb2_grpc
 
 hosted_articles = []
 subscribers = []
