@@ -6,7 +6,7 @@ import registry_server_service_pb2 as registry_server_service_pb2
 import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
 
-max_servers = 2
+max_servers = 10
 servers = {}
 
 class RegisterService(registry_server_service_pb2_grpc.RegistryServerServiceServicer):

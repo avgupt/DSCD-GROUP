@@ -10,7 +10,7 @@ import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 hosted_articles = []
 subscribers = []
 clientele = []
-max_clients = 2
+max_clients = 10
 
 class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
 
@@ -37,12 +37,12 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
 
     def GetArticles(self, request, context):
         # Assuming a valid request
- 
-        # if request.client_id not in clientele:
-        #     context.cancel() 
+        print('ARTICLES REQUEST FROM', request.client_uuid)
 
         filtered = []
-        print(request.author)
+        if request.client_uuid not in clientele:
+            return server_pb2.GetArticlesResponse(article_list=filtered)
+
         if request.date and request.author and request.type:
             filtered = self.filterArticles3(request.date, request.author, request.type)
         elif request.date and request.author:
@@ -53,11 +53,14 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
         return server_pb2.GetArticlesResponse(article_list=filtered)
     
     def PublishArticle(self, request, context):
-        # if request.client_id not in clientele:
-        #     context.cancel()
-        #     return server_pb2.PublishArticleResponse(server_pb2.PublishArticleResponse.Status.FAILED)
+        print('ARTICLES PUBLISH FROM', request.client_uuid)
+        if request.client_uuid not in clientele:
+            # print("hello world")
+            # context.cancel()
+            return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.FAILED)
         
         hosted_articles.append(request.article)
+        print(hosted_articles)
         return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.SUCCESS)
     
     def JoinServer(self, request, context):
