@@ -3,15 +3,14 @@ from __future__ import print_function
 import grpc
 import uuid
 
+from protos.Article.Article_pb2 import Article, Date
+import server_service_pb2 as server_pb2
+import server_service_pb2_grpc as server_pb2_grpc
 
-import server.server_pb2 as server_pb2
-import server.server_pb2_grpc as server_pb2_grpc
-
-from server.protos.Article.Article_pb2 import Article, Date
 
 import logging
-import RegistryServer.registry_server_service_pb2 as registry_server_service_pb2
-import RegistryServer.registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
+import registry_server_service_pb2 as registry_server_service_pb2
+import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
 
 sample_date_1 = Date(date=1, month="January", year=2023)
@@ -42,7 +41,7 @@ class Client:
 
     # We have the server_address using the name of the server. 
     def connectToServer(self, server_name):
-        server_list = self.getServerListFromRegistryServer()
+        server_list = self.getServerListFromRegistryServer().servers
         server_address = server_list[server_name]
         with grpc.insecure_channel(server_address) as channel:
             stub = server_pb2_grpc.ClientServerStub(channel)
@@ -93,9 +92,10 @@ class Client:
 if __name__ == "__main__":
     myClient1 = Client()
     # name input - path
-    myClient1.connectToServer('localhost:8080')
+    # myClient1.connectToServer('localhost:8080')
+    myClient1.connectToServer('server_8080')
 
-    myClient1.start('localhost:8080')
+    # myClient1.start('localhost:8080')
 
     # myClient2 = Client()
     # # myClient2.connectToServer('localhost:8080')

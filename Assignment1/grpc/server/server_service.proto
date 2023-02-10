@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "Article.proto";
+import "protos/Article/Article.proto";
 
 message GetArticlesRequest {
     string client_uuid = 1;

@@ -3,8 +3,8 @@ from __future__ import print_function
 import grpc
 import uuid
 
-import server_pb2 as server_pb2
-import server_pb2_grpc as server_pb2_grpc
+import server_service_pb2 as server_pb2
+import server_service_pb2_grpc as server_pb2_grpc
 
 from protos.Article.Article_pb2 import Article, Date
 
@@ -76,8 +76,6 @@ class Client:
             response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id, date=sample_date_1))
             print(response)
             channel.close()
-
-    def initiate():
 
 
 if __name__ == "__main__":

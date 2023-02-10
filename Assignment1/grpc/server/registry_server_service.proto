@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+enum Status {
+    FAILED = 0;
+    SUCCESS = 1;
+  }
+
+service RegistryServerService {
+    rpc RegisterServer (RegisterServerRequest) returns (RegisterServerResponse) {}
+    rpc GetServerList (GetServerListRequest) returns (GetServerListResponse) {}
+  }
+
+message RegisterServerRequest {
+    string server_name = 1;
+    string ip = 2;
+    int32 port = 3;
+  }
+
+message RegisterServerResponse {
+    Status status = 1;
+  }
+
+// Replace it with google.protobuf.Empty if there would be no request parameters
+message GetServerListRequest {
+
+  }
+
+message GetServerListResponse {
+    map<string, string> servers = 1;
+  }

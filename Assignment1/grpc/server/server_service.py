@@ -2,7 +2,10 @@ from concurrent import futures
 import logging
 
 import grpc
-import server_pb2, server_pb2_grpc
+import  server_service_pb2 as server_pb2
+import server_service_pb2_grpc as server_pb2_grpc
+import registry_server_service_pb2 as registry_server_service_pb2
+import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
 hosted_articles = []
 subscribers = []
@@ -60,7 +63,7 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
     def JoinServer(self, request, context):
         # Assuming unique UUID for client.
         client_uuid = request.client_uuid
-        print("JOIN REQUEST FROM", client_uuid)
+        print('JOIN REQUEST FROM', client_uuid)
         
         if len(clientele) < max_clients:
             clientele.append(client_uuid)
@@ -102,7 +105,13 @@ class Server:
 
     def __isRegistered(self)->bool:
         # TODO(guptashelly): call Register RPC and return response
-        return True
+        print("Will try to register to registry server ...")
+        with grpc.insecure_channel('localhost:50051') as channel:
+            stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
+            
+            response = stub.RegisterServer(registry_server_service_pb2.RegisterServerRequest(server_name=self.name,ip=self.address,port=int(self.port)))
+        print("Registry Server client received: " + str(response.status))
+        return response.status
     
     def __serve(self):
         # TODO(avishi): Refactor code // Remove plag
