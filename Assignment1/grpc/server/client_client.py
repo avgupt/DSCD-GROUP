@@ -25,7 +25,7 @@ class Client:
     def getServerListFromRegistryServer(self):
         with grpc.insecure_channel('localhost:50051') as channel:
             stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
-            response = stub.GetServerList(registry_server_service_pb2.GetServerListRequest())
+            response = stub.GetServerList(registry_server_service_pb2.GetServerListRequest(client_uuid=self.id))
             print(response)
             channel.close()
             return response

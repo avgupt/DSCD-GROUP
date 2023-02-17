@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)grpc/server/registry_server_service.proto\"F\n\x15RegisterServerRequest\x12\x13\n\x0bserver_name\x18\x01 \x01(\t\x12\n\n\x02ip\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\"1\n\x16RegisterServerResponse\x12\x17\n\x06status\x18\x01 \x01(\x0e\x32\x07.Status\"\x16\n\x14GetServerListRequest\"}\n\x15GetServerListResponse\x12\x34\n\x07servers\x18\x01 \x03(\x0b\x32#.GetServerListResponse.ServersEntry\x1a.\n\x0cServersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01*!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x32\x9e\x01\n\x15RegistryServerService\x12\x43\n\x0eRegisterServer\x12\x16.RegisterServerRequest\x1a\x17.RegisterServerResponse\"\x00\x12@\n\rGetServerList\x12\x15.GetServerListRequest\x1a\x16.GetServerListResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)grpc/server/registry_server_service.proto\"F\n\x15RegisterServerRequest\x12\x13\n\x0bserver_name\x18\x01 \x01(\t\x12\n\n\x02ip\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\"1\n\x16RegisterServerResponse\x12\x17\n\x06status\x18\x01 \x01(\x0e\x32\x07.Status\"+\n\x14GetServerListRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\"}\n\x15GetServerListResponse\x12\x34\n\x07servers\x18\x01 \x03(\x0b\x32#.GetServerListResponse.ServersEntry\x1a.\n\x0cServersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01*!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x32\x9e\x01\n\x15RegistryServerService\x12\x43\n\x0eRegisterServer\x12\x16.RegisterServerRequest\x1a\x17.RegisterServerResponse\"\x00\x12@\n\rGetServerList\x12\x15.GetServerListRequest\x1a\x16.GetServerListResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'grpc.server.registry_server_service_pb2', globals())
@@ -22,18 +22,18 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   _GETSERVERLISTRESPONSE_SERVERSENTRY._options = None
   _GETSERVERLISTRESPONSE_SERVERSENTRY._serialized_options = b'8\001'
-  _STATUS._serialized_start=319
-  _STATUS._serialized_end=352
+  _STATUS._serialized_start=340
+  _STATUS._serialized_end=373
   _REGISTERSERVERREQUEST._serialized_start=45
   _REGISTERSERVERREQUEST._serialized_end=115
   _REGISTERSERVERRESPONSE._serialized_start=117
   _REGISTERSERVERRESPONSE._serialized_end=166
   _GETSERVERLISTREQUEST._serialized_start=168
-  _GETSERVERLISTREQUEST._serialized_end=190
-  _GETSERVERLISTRESPONSE._serialized_start=192
-  _GETSERVERLISTRESPONSE._serialized_end=317
-  _GETSERVERLISTRESPONSE_SERVERSENTRY._serialized_start=271
-  _GETSERVERLISTRESPONSE_SERVERSENTRY._serialized_end=317
-  _REGISTRYSERVERSERVICE._serialized_start=355
-  _REGISTRYSERVERSERVICE._serialized_end=513
+  _GETSERVERLISTREQUEST._serialized_end=211
+  _GETSERVERLISTRESPONSE._serialized_start=213
+  _GETSERVERLISTRESPONSE._serialized_end=338
+  _GETSERVERLISTRESPONSE_SERVERSENTRY._serialized_start=292
+  _GETSERVERLISTRESPONSE_SERVERSENTRY._serialized_end=338
+  _REGISTRYSERVERSERVICE._serialized_start=376
+  _REGISTRYSERVERSERVICE._serialized_end=534
 # @@protoc_insertion_point(module_scope)

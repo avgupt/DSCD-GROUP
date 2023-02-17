@@ -14,10 +14,10 @@ import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 from client_client import Client 
 
 
-sample_date_1 = Date(date=1, month="January", year=2023)
-sample_date_2 = Date(date=8, month="January", year=2023)
-sample_date_3 = Date(date=16, month="February", year=2023)
-sample_date_4 = Date(date=21, month="March", year=2023)
+sample_date_1 = Date(date=1, month=1, year=2023)
+sample_date_2 = Date(date=8, month=1, year=2023)
+sample_date_3 = Date(date=16, month=2, year=2023)
+sample_date_4 = Date(date=21, month=3, year=2023)
 
 sample_article_1 = Article(id=1, author="Jane", time=sample_date_1, content="hello world")
 sample_article_2 = Article(id=2, author="John", time=sample_date_2, content="hello world1")
@@ -29,8 +29,8 @@ if __name__ == "__main__":
     myClient1 = Client()
     # name input - path
     # myClient1.connectToServer('localhost:8080')
-    sample_date_1 = Date(date=1, month="January", year=2023)
-    sample_article_1 = Article(id=1, author="Jane", time=sample_date_1, content="hello world")
+    sample_date_1 = Date(date=1, month=1, year=2023)
+    sample_article_1 = Article(id=1, author="Jane", content="hello world")
     server_name='server_8080'
     server_name2='server_8081'
 

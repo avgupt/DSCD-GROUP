@@ -20,10 +20,9 @@ message RegisterServerResponse {
     Status status = 1;
   }
 
-// Replace it with google.protobuf.Empty if there would be no request parameters
 message GetServerListRequest {
-
-  }
+    string client_uuid = 1;
+}
 
 message GetServerListResponse {
     map<string, string> servers = 1;

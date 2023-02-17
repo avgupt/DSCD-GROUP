@@ -1,11 +1,14 @@
 from concurrent import futures
+from datetime import date
 import logging
+import datetime
 
 import grpc
 import  server_service_pb2 as server_pb2
 import server_service_pb2_grpc as server_pb2_grpc
 import registry_server_service_pb2 as registry_server_service_pb2
 import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
+from protos.Article.Article_pb2 import Article, Date
 
 hosted_articles = []
 subscribers = []
@@ -14,24 +17,29 @@ max_clients = 10
 
 class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
 
+    def compareTime(self,article_time, request_articles_time):
+        article_date_object = datetime.datetime(article_time.year, article_time.month, article_time.date) # date in yyyy/mm/dd format
+        request_articles_date_object = datetime.datetime(request_articles_time.year, request_articles_time.month, request_articles_time.date)
+        return article_date_object >= request_articles_date_object
+
     def filterArticles1(self, time):
         filtered = []
         for article in hosted_articles:
-            if article.time == time:
+            if self.compareTime(article.time, time):
                 filtered.append(article)
         return filtered
     
     def filterArticles2(self, time, author):
         filtered = []
         for article in hosted_articles:
-            if article.time == time and article.author == author:
+            if self.compareTime(article.time, time) and article.author == author:
                 filtered.append(article)
         return filtered
 
     def filterArticles3(self, time, author, article_type):
         filtered = []
         for article in hosted_articles:
-            if article.time == time and article.author == author and article.WhichOneof('config') == article_type:
+            if self.compareTime(article.time, time) and article.author == author and article.WhichOneof('config') == article_type:
                 filtered.append(article)
         return filtered        
 
@@ -58,8 +66,12 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
             # print("hello world")
             # context.cancel()
             return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.FAILED)
-        
-        hosted_articles.append(request.article)
+        print("article request",str(request.article))
+        today_date = date.today()
+        date_object = Date(date=int(today_date.day), month=int(today_date.month),year=int(today_date.year))
+        print(date_object)
+        article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content)
+        hosted_articles.append(article)
         print(hosted_articles)
         return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.SUCCESS)
     
@@ -113,6 +125,7 @@ class Server:
             stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
             
             response = stub.RegisterServer(registry_server_service_pb2.RegisterServerRequest(server_name=self.name,ip=self.address,port=int(self.port)))
+        print(response.status)
         print("Registry Server client received: " + str(response.status))
         return response.status
     
