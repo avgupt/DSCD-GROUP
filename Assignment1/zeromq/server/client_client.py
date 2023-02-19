@@ -5,12 +5,10 @@ import uuid
 
 from protos.Article.Article_pb2 import Article, Date
 import server_service_pb2 as server_pb2
-import server_service_pb2_grpc as server_pb2_grpc
 
 
 import logging
 import registry_server_service_pb2 as registry_server_service_pb2
-import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
 
 

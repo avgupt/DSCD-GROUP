@@ -4,7 +4,7 @@ import logging
 import registry_server_service_pb2 as registry_server_service_pb2 
 import zmq
 import signal
-
+import time
 
 
 max_servers = 10
@@ -14,16 +14,14 @@ class RegisterServer:
 
     def start(self, port):    
         context = zmq.Context()
-        server = context.socket(zmq.ROUTER)
+        server = context.socket(zmq.REP)
         server.bind("tcp://*:%s" % port)
 
         while True:
             message = server.recv_multipart()
-            print(message)
             request = registry_server_service_pb2.RegisterServerRequest()
-            print(request)
             request.ParseFromString(message[-1])
-
+            
             if request.ip:
                 server.send(self.RegisterServer(request))
             else:

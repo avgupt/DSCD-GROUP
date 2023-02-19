@@ -41,14 +41,17 @@ class Server:
         request = self.getRegistryServerRequest().SerializeToString()
         print("Will try to register to registry server ...")
         context = zmq.Context()
-        client = context.socket(zmq.DEALER)
+        client = context.socket(zmq.REQ)
         client.connect("tcp://localhost:50051")
         client.send(request)
-        response = client.recv()
-        # response = registry_server_service_pb2.RegisterServerResponse().SerializeToString()
-        print(response)
-        client.send(b"STOP")
-
+        message = client.recv_multipart()
+        response = registry_server_service_pb2.RegisterServerResponse()
+        response.ParseFromString(message[-1])
+        
+        if response.status == registry_server_service_pb2.Status.SUCCESS:
+            return True
+        return False
+        
     
     def __serve(self):
         context = zmq.Context()
