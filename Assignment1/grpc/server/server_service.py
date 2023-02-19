@@ -41,7 +41,7 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
     def filterArticles3(self, time, author, article_type):
         filtered = []
         for article in hosted_articles:
-            if self.compareTime(article.time, time) and article.author == author and article.WhichOneof('config') == article_type:
+            if self.compareTime(article.time, time) and article.author == author and article.WhichOneof('type') == article_type:
                 filtered.append(article)
         return filtered        
 
@@ -85,7 +85,13 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
             return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.FAILED)
         today_date = date.today()
         date_object = Date(date=int(today_date.day), month=int(today_date.month),year=int(today_date.year))
-        article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content)
+        # article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content)
+        if (request.article.WhichOneof('type') == "sports"):
+            article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content, sports="SPORTS")
+        elif (request.article.WhichOneof('type') == "fashion"):
+            article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content, fashion="FASHION")
+        else:
+            article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content, politics="POLITICS")
         hosted_articles.append(article)
         return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.SUCCESS)
 

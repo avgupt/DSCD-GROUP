@@ -19,10 +19,12 @@ sample_date_2 = Date(date=8, month=1, year=2023)
 sample_date_3 = Date(date=16, month=2, year=2023)
 sample_date_4 = Date(date=21, month=3, year=2023)
 
-sample_article_1 = Article(id=1, author="Jane", content="hello world")
-sample_article_2 = Article(id=2, author="John", content="hello world1")
+sample_article_1 = Article(id=1, author="Jane", content="hello world", sports="SPORTS")
+sample_article_2 = Article(id=1, author="Jane", content="hello world", fashion="FASHION")
 sample_article_3 = Article(id=3, author="Jolly", content="hello world2")
 sample_article_4 = Article(id=4, author="Jan",  content="hello world3")
+
+ARTICLE_TYPE = {'S': 'sports', 'F': 'fashion', 'P': 'politics'}
 
 class Client:
 
@@ -117,7 +119,8 @@ if __name__== "__main__":
 
         if n == 1:
             myClient.getServerListFromRegistryServer()
-
+        elif n > 5:
+            print("INVALID REQUEST")
         else:
             server_name = input("Enter server name: ")
 
@@ -128,7 +131,20 @@ if __name__== "__main__":
                 myClient.leaveServer(server_name)
             
             elif n == 4:
-                myClient.getArticles(server_name=server_name,date=sample_date_1)
+                 # # Assuming valid input
+                date = input("Enter date (dd/mm/yyyy): ")
+                article_type = input("Enter type (Sports(S), fashion(F), politics(P): ")
+                author = input("Enter author: ")
+
+                if date != '':
+                    date = Date(date=int(date.split("/")[0]), month=int(date.split('/')[1]), year=int(date.split('/')[2]))
+                else:
+                    date = None
+                if article_type in ARTICLE_TYPE.keys():
+                    article_type = ARTICLE_TYPE[article_type]
+                
+                myClient.getArticles(server_name=server_name,date=date,author=author,type=article_type)
+
             
             else:
                 article_num = int(input("Enter article number: "))
@@ -140,3 +156,4 @@ if __name__== "__main__":
                 elif article == 3:
                     article = sample_article_3
                 myClient.publishArticle(article,server_name)
+                # articles = myClient.GetArticles(port, date, article_type, author)
