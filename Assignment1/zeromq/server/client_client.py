@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import grpc
+import zmq
 import uuid
 
 from protos.Article.Article_pb2 import Article, Date
@@ -21,66 +21,84 @@ class Client:
 
     # RPC from client to Registry server
     def getServerListFromRegistryServer(self):
-        with grpc.insecure_channel('localhost:50051') as channel:
-            stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
-            response = stub.GetServerList(registry_server_service_pb2.GetServerListRequest(client_uuid=self.id))
-            print(response)
-            channel.close()
-            return response
+        request = registry_server_service_pb2.GetServerListRequest(client_uuid=self.id).SerializeToString()
+        context = zmq.Context()
+        client = context.socket(zmq.REQ)
+        client.connect("tcp://localhost:50051")
+        client.send(request)
+        message = client.recv_multipart()
+        response = registry_server_service_pb2.GetServerListResponse()
+        response.ParseFromString(message[-1])
+        return response
 
     # We have the server_address using the name of the server. 
     def connectToServer(self, server_name):
         server_list = self.getServerListFromRegistryServer().servers
         server_address = server_list[server_name]
-        with grpc.insecure_channel(server_address) as channel:
-            stub = server_pb2_grpc.ClientServerStub(channel)
-            response = stub.JoinServer(server_pb2.ServerJoinRequest(client_uuid=self.id))
-            print(response)
-            channel.close()
+        request = server_pb2.ServerJoinRequest(client_uuid=self.id, fname="connectToServer").SerializeToString()
+        context = zmq.Context()
+        client = context.socket(zmq.REQ)
+        print(server_address)
+        client.connect("tcp://"+server_address)
+        client.send(request)
+        message = client.recv_multipart()
+        response = server_pb2.ServerJoinResponse()
+        response.ParseFromString(message[-1])
+        print(response)
+        
 
     def leaveServer(self, server_name):
         server_list = self.getServerListFromRegistryServer().servers
         server_address = server_list[server_name]
-        with grpc.insecure_channel(server_address) as channel:
-            stub = server_pb2_grpc.ClientServerStub(channel)
-            response = stub.LeaveServer(server_pb2.ServerLeaveRequest(client_uuid=self.id))
-            print(response.status)
-            channel.close()
+        request = server_pb2.ServerLeaveRequest(client_uuid=self.id, fname="leaveServer").SerializeToString()
+        context = zmq.Context()
+        client = context.socket(zmq.REQ)
+        client.connect("tcp://"+server_address)
+        client.send(request)
+        message = client.recv_multipart()
+        response = server_pb2.ServerLeaveResponse()
+        response.ParseFromString(message[-1])
+        print(response)
+        
 
     def publishArticle(self, sample_article, server_name):
         server_list = self.getServerListFromRegistryServer().servers
         server_address = server_list[server_name]
-        
-        with grpc.insecure_channel(server_address , options=(('grpc.enable_http_proxy', 0),)) as channel:
-            stub = server_pb2_grpc.ClientServerStub(channel)
-            response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article))
-            print(response.status)
-            channel.close()
+        request = server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article, fname="publishArticle").SerializeToString()
+        context = zmq.Context()
+        client = context.socket(zmq.REQ)
+        client.connect("tcp://"+server_address)
+        client.send(request)
+        message = client.recv_multipart()
+        response = server_pb2.PublishArticleResponse()
+        response.ParseFromString(message[-1])
+        print(response)
     
     def getArticles(self, server_name ,date=None, type=None, author=None):
         server_list = self.getServerListFromRegistryServer().servers
         server_address = server_list[server_name]
-        
-        with grpc.insecure_channel(server_address , options=(('grpc.enable_http_proxy', 0),)) as channel:
-            stub = server_pb2_grpc.ClientServerStub(channel)       
-            response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id,date=date,type=type,author=author))
-            print(response)
-            channel.close()
+        request = server_pb2.GetArticlesRequest(client_uuid=self.id, date=date,type=type,author=author, fname="publishArticle").SerializeToString()
+        context = zmq.Context()
+        client = context.socket(zmq.REQ)
+        client.connect("tcp://"+server_address)
+        client.send(request)
+        message = client.recv_multipart()
+        response = server_pb2.GetArticlesResponse()
+        response.ParseFromString(message[-1])
+        print(response)
 
-    # def start(self, server_address):
-    #     # TODO(avishi): Refactor code
-    #     # Reference: www.tutorialspoint.com/grpc/grpc_helloworld_app_with_python.htm
-    #     print(self.id)
-    #     with grpc.insecure_channel(server_address , options=(('grpc.enable_http_proxy', 0),)) as channel:
-    #         stub = server_pb2_grpc.ClientServerStub(channel)
-    #         # response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_1))
-    #         # print(response)
-    #         # response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_2))
-    #         # # print(response)
-    #         response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id))
-    #         print(response)
-    #         # response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article_3))
-    #         # response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.id, date=sample_date_1))
-    #         # print(response)
-    #         channel.close()
 
+if __name__ == "__main__":
+    myClient1 = Client()
+    # name input - path
+    # myClient1.connectToServer('localhost:8080')
+    sample_date_1 = Date(date=1, month=1, year=2023)
+    sample_article_1 = Article(id=1, author="Jane", content="hello world")
+    server_name='server_8080'
+    server_name2='server_8081'
+
+    myClient1.connectToServer(server_name)
+    myClient1.publishArticle(sample_article_1, server_name)
+    myClient1.getArticles(server_name=server_name,date=sample_date_1)
+
+    myClient1.leaveServer(server_name)

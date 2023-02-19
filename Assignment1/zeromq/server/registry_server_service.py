@@ -19,14 +19,16 @@ class RegisterServer:
 
         while True:
             message = server.recv_multipart()
-            request = registry_server_service_pb2.RegisterServerRequest()
-            request.ParseFromString(message[-1])
+            m2 = message[-1].decode("cp437") 
             
-            if request.ip:
+            if "localhost" in m2:
+                request = registry_server_service_pb2.RegisterServerRequest()
+                request.ParseFromString(message[-1])
                 server.send(self.RegisterServer(request))
+            
             else:
                 request = registry_server_service_pb2.GetServerListRequest()
-                request.ParseFromString(message)
+                request.ParseFromString(message[-1])
                 server.send(self.GetServerList(request))
             
 

@@ -4,11 +4,12 @@ import "protos/Article/Article.proto";
 
 message GetArticlesRequest {
     string client_uuid = 1;
-
+    
     // article info:
     string type = 2;
     string author = 3;
-    Date date = 4;   
+    Date date = 4; 
+    string fname = 5;  
 }
 
 message GetArticlesResponse {
@@ -18,6 +19,7 @@ message GetArticlesResponse {
 message PublishArticleRequest {
     string client_uuid = 1;
     Article article = 2;
+    string fname = 5;
 }
 
 message PublishArticleResponse {
@@ -32,6 +34,7 @@ message PublishArticleResponse {
 
 message ServerJoinRequest {
     string client_uuid = 1;
+    string fname = 5;
 }
 
 message ServerJoinResponse {
@@ -45,6 +48,7 @@ message ServerJoinResponse {
 
 message ServerLeaveRequest {
     string client_uuid = 1;
+    string fname = 5;
 }
 
 message ServerLeaveResponse {
