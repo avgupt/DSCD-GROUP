@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+message Date {
+	int32 date = 1;
+	int32 month = 2;
+	int32 year = 3;  
+}
+
+message Article {
+	int32 id = 1;
+	string author = 2;
+    Date time = 3;
+    string content = 4;
+
+	oneof type {
+		string sports = 5;
+		string fashion = 6;
+		string politics = 7;
+	}
+}
