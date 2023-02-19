@@ -18,10 +18,11 @@ class RegisterServer:
         server.bind("tcp://*:%s" % port)
 
         while True:
-            message = server.recv()
+            message = server.recv_multipart()
+            print(message)
             request = registry_server_service_pb2.RegisterServerRequest()
             print(request)
-            request.ParseFromString(message)
+            request.ParseFromString(message[-1])
 
             if request.ip:
                 server.send(self.RegisterServer(request))

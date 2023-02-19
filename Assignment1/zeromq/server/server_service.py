@@ -9,7 +9,6 @@ from protos.Article.Article_pb2 import Article, Date
 import signal
 import zmq
 
-
 hosted_articles = []
 subscribers = []
 clientele = []
