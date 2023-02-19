@@ -16,9 +16,13 @@ import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
 class Client:
 
-    def __init__(self):
+    def __init__(self,server_name=None):
         uuid_string = str(uuid.uuid1())
-        self.id = uuid_string
+        self.client_is_server = server_name is not None
+        if server_name is not None:
+            self.id = server_name
+        else:
+            self.id = uuid_string
         
 
     # RPC from client to Registry server
@@ -36,7 +40,7 @@ class Client:
         server_address = server_list[server_name]
         with grpc.insecure_channel(server_address) as channel:
             stub = server_pb2_grpc.ClientServerStub(channel)
-            response = stub.JoinServer(server_pb2.ServerJoinRequest(client_uuid=self.id))
+            response = stub.JoinServer(server_pb2.ServerJoinRequest(client_uuid=self.id,is_server=self.client_is_server))
             print(response)
             channel.close()
 
