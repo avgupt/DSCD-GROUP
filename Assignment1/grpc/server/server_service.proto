@@ -33,6 +33,7 @@ message PublishArticleResponse {
 
 message ServerJoinRequest {
     string client_uuid = 1;
+    bool is_server = 2;
 }
 
 message ServerJoinResponse {
