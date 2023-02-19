@@ -24,7 +24,7 @@ class Client(object):
 
         self.channel = self.connection.channel()
 
-        result = self.channel.queue_declare(queue='', exclusive=True)
+        result = self.channel.queue_declare(queue='')
         self.callback_queue = result.method.queue
 
         self.channel.basic_consume(
@@ -95,7 +95,7 @@ class Client(object):
                 correlation_id=self.corr_id,
             ),
             body=request)
-        self.connection.process_data_events(time_limit=5)
+        self.connection.process_data_events(time_limit=None)
 
         if not self.response:
             return "FAILED"
@@ -106,7 +106,7 @@ class Client(object):
     
     def GetArticles(self, port, date=None, type=None, author=None):
         queue_name = "server_" + str(port) + "_article"
-        request = server_proto.GetArticlesRequest(client_uuid=self.id,date=date,type=type,author=author).SerializeToString()
+        request = server_proto.GetArticlesRequest(client_uuid=self.id,date=date,type=type,author=author, is_get=True).SerializeToString()
 
         self.response = None
         self.corr_id = str(uuid.uuid4())
@@ -118,7 +118,7 @@ class Client(object):
                 correlation_id=self.corr_id,
             ),
             body=request)
-        self.connection.process_data_events(time_limit=5)
+        self.connection.process_data_events(time_limit=None)
 
         if not self.response:
             return
@@ -129,7 +129,7 @@ class Client(object):
     
     def PublishArticle(self, port, sample_article):
         queue_name = "server_" + str(port) + "_article"
-        request = server_proto.PublishArticleRequest(client_uuid=self.id, article=sample_article).SerializeToString()
+        request = server_proto.PublishArticleRequest(client_uuid=self.id, article=sample_article, is_get=False).SerializeToString()
 
         self.response = None
         self.corr_id = str(uuid.uuid4())
@@ -198,5 +198,5 @@ while(True):
         elif n == 5:
             article = sample_article_1
             print(myClient.PublishArticle(port, article))
-            # print(myClient.PublishArticle(port, sample_article_2))
+            print(myClient.PublishArticle(port, sample_article_2))
 

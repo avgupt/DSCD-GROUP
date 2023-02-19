@@ -8,7 +8,8 @@ message GetArticlesRequest {
     // article info:
     string type = 2;
     string author = 3;
-    Date date = 4;   
+    Date date = 4;
+    bool is_get = 5;   
 }
 
 message GetArticlesResponse {
@@ -18,6 +19,7 @@ message GetArticlesResponse {
 message PublishArticleRequest {
     string client_uuid = 1;
     Article article = 2;
+    bool is_get = 5;   
 }
 
 message PublishArticleResponse {

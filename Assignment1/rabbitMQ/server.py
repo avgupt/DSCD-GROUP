@@ -120,11 +120,13 @@ class Server:
         ch.basic_ack(delivery_tag=method.delivery_tag)  
 
     def __handleArticleRequest(self, ch, method, props, body):
-        print("here")
-        try:
+        request = server_proto.GetArticlesRequest()
+        request.ParseFromString(body)
+
+        if request.is_get:
             request = server_proto.GetArticlesRequest()
             request.ParseFromString(body)
-
+            print(request)
             ch.basic_publish(exchange='',
                 routing_key=props.reply_to,
                 properties=pika.BasicProperties(correlation_id = \
@@ -132,7 +134,7 @@ class Server:
                 body=self.__getArticles(request))
 
 
-        except DecodeError:
+        else:
             request = server_proto.PublishArticleRequest()
             request.ParseFromString(body)
             ch.basic_publish(exchange='',
@@ -206,7 +208,6 @@ class Server:
         date = request.date
         if request.date and (request.date.year == 0 or request.date.month == 0 or request.date.date == 0):
             date = None
-        
         if date and request.author and request.type:
             filtered = self.__filterArticles3(date, request.author, request.type)
         elif date and request.author:
@@ -222,7 +223,7 @@ class Server:
         print('ARTICLES PUBLISH FROM', request.client_uuid)
 
         if request.client_uuid not in self.clientele:
-            print("OHNO")
+            # print("OHNO")
             return server_proto.PublishArticleResponse(status=server_proto.PublishArticleResponse.Status.FAILED).SerializeToString()
         
         today_date = date.today()
