@@ -12,7 +12,7 @@ import zmq
 hosted_articles = []
 subscribers = []
 clientele = []
-max_clients = 10
+max_clients = 2
 
 
 
@@ -30,7 +30,8 @@ class Server:
 
     def start(self):
         if not self.__isRegistered():
-            print("Could not register server")
+            # print("Could not register server")
+            pass
         else:
             self.__serve()
     
@@ -39,7 +40,7 @@ class Server:
     
     def __isRegistered(self)->bool:
         request = self.getRegistryServerRequest().SerializeToString()
-        print("Will try to register to registry server ...")
+        # print("Will try to register to registry server ...")
         context = zmq.Context()
         client = context.socket(zmq.REQ)
         client.connect("tcp://localhost:50051")
@@ -64,7 +65,7 @@ class Server:
         while True:
             message = server.recv_multipart()
             m2 = message[-1].decode("cp437") 
-            print(m2)
+            # print(m2)
             
             if "connectToServer" in m2:
                 request = server_pb2.ServerJoinRequest()

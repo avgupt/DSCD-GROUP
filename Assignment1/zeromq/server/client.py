@@ -29,6 +29,7 @@ class Client:
         message = client.recv_multipart()
         response = registry_server_service_pb2.GetServerListResponse()
         response.ParseFromString(message[-1])
+        print(response)
         return response
 
     # We have the server_address using the name of the server. 
@@ -44,7 +45,12 @@ class Client:
         message = client.recv_multipart()
         response = server_pb2.ServerJoinResponse()
         response.ParseFromString(message[-1])
-        print(response)
+        if response.status == registry_server_service_pb2.Status.SUCCESS:
+            print("SUCCESS")
+            return True
+        
+        print("FAIL")
+        return False
         
 
     def leaveServer(self, server_name):
@@ -58,7 +64,12 @@ class Client:
         message = client.recv_multipart()
         response = server_pb2.ServerLeaveResponse()
         response.ParseFromString(message[-1])
-        print(response)
+        if response.status == registry_server_service_pb2.Status.SUCCESS:
+            print("SUCCESS")
+            return True
+        
+        print("FAIL")
+        return False
         
 
     def publishArticle(self, sample_article, server_name):
@@ -72,7 +83,12 @@ class Client:
         message = client.recv_multipart()
         response = server_pb2.PublishArticleResponse()
         response.ParseFromString(message[-1])
-        print(response)
+        if response.status == registry_server_service_pb2.Status.SUCCESS:
+            print("SUCCESS")
+            return True
+        
+        print("FAIL")
+        return False
     
     def getArticles(self, server_name ,date=None, type=None, author=None):
         server_list = self.getServerListFromRegistryServer().servers
@@ -89,16 +105,31 @@ class Client:
 
 
 if __name__ == "__main__":
-    myClient1 = Client()
-    # name input - path
-    # myClient1.connectToServer('localhost:8080')
     sample_date_1 = Date(date=1, month=1, year=2023)
     sample_article_1 = Article(id=1, author="Jane", content="hello world")
-    server_name='server_8080'
-    server_name2='server_8081'
+    sample_article_2 = Article(id=2, author="John", content="hello world 2")
+    myClient = Client()
 
-    myClient1.connectToServer(server_name)
-    myClient1.publishArticle(sample_article_1, server_name)
-    myClient1.getArticles(server_name=server_name,date=sample_date_1)
+    while(True):
+        print("GetServerList[1], JoinServer[2], LeaveServer[3], GetArticles[4], PublishArticle[5]:")
+        n = int(input())
 
-    myClient1.leaveServer(server_name)
+        if n == 1:
+            print(myClient.getServerListFromRegistryServer())
+
+        else:
+            port = input("Enter server name: ")
+
+            if n == 2:
+                print(myClient.connectToServer(port))
+            
+            elif n == 3:
+                print(myClient.leaveServer(port))
+            
+            elif n == 4:
+                # TODO: take input
+                print(myClient.getArticles(port, date = sample_date_1))
+            
+            else:
+                article = sample_article_1
+                print(myClient.publishArticle(article, port))
