@@ -106,30 +106,54 @@ class Client:
 
 if __name__ == "__main__":
     sample_date_1 = Date(date=1, month=1, year=2023)
-    sample_article_1 = Article(id=1, author="Jane", content="hello world")
-    sample_article_2 = Article(id=2, author="John", content="hello world 2")
+    sample_article_1 = Article(id=1, author="Jane", content="hello world", sports="SPORTS")
+    sample_article_2 = Article(id=1, author="Jane", content="hello world", fashion="FASHION")
+    ARTICLE_TYPE = {'S': 'sports', 'F': 'fashion', 'P': 'politics'}
+
     myClient = Client()
+print("Starting Client...\n")
+print("Client ID: ", myClient.id)
 
-    while(True):
-        print("GetServerList[1], JoinServer[2], LeaveServer[3], GetArticles[4], PublishArticle[5]:")
-        n = int(input())
-
-        if n == 1:
-            print(myClient.getServerListFromRegistryServer())
-
-        else:
-            port = input("Enter server name: ")
-
-            if n == 2:
-                print(myClient.connectToServer(port))
+while(True):
+    print("\nGetServerList[1], JoinServer[2], LeaveServer[3], GetArticles[4], PublishArticle[5]")
+    
+    n = int(input())
+    if n == 1:
+        server_list = myClient.getServerListFromRegistryServer().servers
+        for server_name in server_list.keys():
+            print(server_name + " - " + server_list[server_name])
+    elif n > 5:
+        print("INVALID REQUEST")
+    else:
+        port = input("Enter server name: ")
+        if n == 2:
+            print(myClient.connectToServer(port))
+        elif n == 3:
+            print(myClient.leaveServer(port))
+        elif n == 4:
+            # Assuming valid input
+            date = input("Enter date (dd/mm/yyyy): ")
+            article_type = input("Enter type (Sports(S), fashion(F), politics(P): ")
+            author = input("Enter author: ")
             
-            elif n == 3:
-                print(myClient.leaveServer(port))
-            
-            elif n == 4:
-                # TODO: take input
-                print(myClient.getArticles(port, date = sample_date_1))
-            
+            if date != '':
+                date = Date(date=int(date.split("/")[0]), month=int(date.split('/')[1]), year=int(date.split('/')[2]))
             else:
-                article = sample_article_1
-                print(myClient.publishArticle(article, port))
+                date = None
+            if article_type in ARTICLE_TYPE.keys():
+                article_type = ARTICLE_TYPE[article_type]
+                
+            articles = myClient.getArticles(port, date, article_type, author)
+            if articles:
+                articles = articles.article_list
+                count = 1
+                for article in articles:
+                    print(count)
+                    print(article.WhichOneof('type'))
+                    print(article.author)
+                    print(str(article.time.date) + '/' + str(article.time.month) + '/' + str(article.time.month))
+                    print(article.content)
+                    count += 1
+        elif n == 5:
+            article = sample_article_1
+            print(myClient.publishArticle(article, port))

@@ -110,7 +110,7 @@ class Server:
     def filterArticles3(self, time, author, article_type):
         filtered = []
         for article in hosted_articles:
-            if self.compareTime(article.time, time) and article.author == author and article.WhichOneof('config') == article_type:
+            if self.compareTime(article.time, time) and article.author == author and article.WhichOneof('type') == article_type:
                 filtered.append(article)
         return filtered        
 
@@ -133,17 +133,21 @@ class Server:
     
     def PublishArticle(self, request):
         print('ARTICLES PUBLISH FROM', request.client_uuid)
+
         if request.client_uuid not in clientele:
-            # print("hello world")
-            # context.cancel()
+            # print("OHNO")
             return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.FAILED).SerializeToString()
-        print("article request",str(request.article))
+        
         today_date = date.today()
         date_object = Date(date=int(today_date.day), month=int(today_date.month),year=int(today_date.year))
-        print(date_object)
-        article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content)
+        if (request.article.WhichOneof('type') == "sports"):
+            article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content, sports="SPORTS")
+        elif (request.article.WhichOneof('type') == "fashion"):
+            article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content, fashion="FASHION")
+        else:
+            article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content, politics="POLITICS")
+
         hosted_articles.append(article)
-        print(hosted_articles)
         return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.SUCCESS).SerializeToString()
     
     def JoinServer(self, request):
