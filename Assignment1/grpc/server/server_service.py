@@ -9,13 +9,11 @@ import server_service_pb2_grpc as server_pb2_grpc
 import registry_server_service_pb2 as registry_server_service_pb2
 import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 from protos.Article.Article_pb2 import Article, Date
-from client_client import Client 
 
 hosted_articles = []
-hosted_articles_ids = []
-clients_server = [] #clients which are server also
 clientele = []
 max_clients = 10
+subscribed_to = [] # stores address of servers this server is subscribed to
 
 class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
     def __init__(self, server_name):
@@ -51,6 +49,12 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
         # Assuming a valid request
         print('ARTICLES REQUEST FROM', request.client_uuid)
 
+        if self.name in request.visited:
+            return server_pb2.GetArticlesResponse(article_list=[])
+
+        visited = request.visited
+        visited.append(self.name)
+
         filtered = []
         if request.client_uuid not in clientele:
             return server_pb2.GetArticlesResponse(article_list=filtered)
@@ -62,35 +66,28 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
         else:
             filtered = self.filterArticles1(request.date)
 
+        for server_address in subscribed_to:
+            response = self.getArticlesFromJoinedServer(server_address,visited,request.date,request.author,request.type)
+            filtered.extend(response.article_list)
         return server_pb2.GetArticlesResponse(article_list=filtered)
+
+    def getArticlesFromJoinedServer(self,server_address,visited,date=None,type=None,author=None):
+        with grpc.insecure_channel(server_address , options=(('grpc.enable_http_proxy', 0),)) as channel:
+            stub = server_pb2_grpc.ClientServerStub(channel)       
+            response = stub.GetArticles(server_pb2.GetArticlesRequest(client_uuid=self.name,date=date,type=type,author=author,visited=visited))
+            print(response.article_list)
+            channel.close()
+            return response
     
     def PublishArticle(self, request, context):
         print('ARTICLES PUBLISH FROM', request.client_uuid)
-        if (request.client_uuid not in clientele) or (request.article.id in hosted_articles_ids):
-            # context.cancel()
+        if (request.client_uuid not in clientele):
             return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.FAILED)
-        print("article request",str(request.article))
         today_date = date.today()
         date_object = Date(date=int(today_date.day), month=int(today_date.month),year=int(today_date.year))
-        print(date_object)
         article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content)
         hosted_articles.append(article)
-        hosted_articles_ids.append(request.article.id)
-        print(hosted_articles)
-
-        # (BONUS) add published article to client_server hosted_articles
-        for client_server_name in clients_server:
-            self.publishArticleToJoinedServer(client_server_name,article)
-
         return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.SUCCESS)
-
-    # (BONUS)
-    def publishArticleToJoinedServer(self,client_server_name,article):
-        myClient = Client(server_name=self.name)
-        myClient.connectToServer(client_server_name)
-        myClient.publishArticle(sample_article=article,server_name=client_server_name)
-        myClient.leaveServer(client_server_name)
-
 
     def JoinServer(self, request, context):
         # Assuming unique UUID for client.
@@ -98,15 +95,23 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
         print('JOIN REQUEST FROM', client_uuid)
         
         if len(clientele) < max_clients:
-            # if client requesting to join is a server then add its uuid to clients_server (BONUS)
-            if request.is_server and (client_uuid not in clients_server):
-                clients_server.append(client_uuid)
             clientele.append(client_uuid)
             # Success: client accepted and added to clientale.
             return server_pb2.ServerJoinResponse(status=server_pb2.ServerJoinResponse.Status.SUCCESS)
         
         # Failure: Client not added to the clientale list
         return server_pb2.ServerJoinResponse(status=server_pb2.ServerJoinResponse.Status.FAILED)
+
+    def ClientServerJoinServer(self, request, context):
+        with grpc.insecure_channel(request.server_address) as channel:
+                stub = server_pb2_grpc.ClientServerStub(channel)
+                response = stub.JoinServer(server_pb2.ServerJoinRequest(client_uuid=self.name,is_server=True))
+                subscribed_to.append(request.server_address)
+                channel.close()
+                if response.status is server_pb2.ServerJoinResponse.Status.SUCCESS:
+                    return server_pb2.ClientServerJoinServerResponse(status=server_pb2.ClientServerJoinServerResponse.Status.SUCCESS)
+        return server_pb2.ClientServerJoinServerResponse(status=server_pb2.ClientServerJoinServerResponse.Status.FAILED)
+
     
     def LeaveServer(self, request, context):
         # Assuming unique UUID for client
@@ -115,8 +120,6 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
         
         if (client_uuid in clientele):
             clientele.remove(client_uuid)
-            if (client_uuid in clients_server):
-                clients_server.remove(client_uuid)
             return server_pb2.ServerLeaveResponse(status=server_pb2.ServerLeaveResponse.Status.SUCCESS)
 
         return server_pb2.ServerLeaveResponse(status=server_pb2.ServerLeaveResponse.Status.FAILED)
@@ -141,19 +144,18 @@ class Server:
             self.__serve()
 
     def __isRegistered(self)->bool:
-        # TODO(guptashelly): call Register RPC and return response
         print("Will try to register to registry server ...")
         with grpc.insecure_channel('localhost:50051') as channel:
             stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
             
             response = stub.RegisterServer(registry_server_service_pb2.RegisterServerRequest(server_name=self.name,ip=self.address,port=int(self.port)))
-        print(response.status)
-        print("Registry Server client received: " + str(response.status))
+            if response.status == registry_server_service_pb2.Status.SUCCESS:
+                print("SUCCESS")
+            else:
+                print("FAILED")
         return response.status
     
     def __serve(self):
-        # TODO(avishi): Refactor code // Remove plag
-        # Reference: https://realpython.com/python-microservices-grpc/
 
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         server_pb2_grpc.add_ClientServerServicer_to_server(

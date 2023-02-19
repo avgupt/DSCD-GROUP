@@ -28,9 +28,11 @@ sample_article_4 = Article(id=4, author="Jan",  content="hello world3")
 if __name__ == "__main__":
     server_name1='serverA'
     server_name2='serverB'
+    server_name3='serverC'
     myClient1 = Client()
     myClient2 = Client(server_name=server_name1)
     myClient3 = Client(server_name=server_name2)
+    myClient4 = Client(server_name=server_name3)
     # name input - path
     # myClient1.connectToServer('localhost:8080')
     sample_date_1 = Date(date=1, month=1, year=2023)
@@ -38,11 +40,16 @@ if __name__ == "__main__":
 
 
     myClient1.connectToServer(server_name1)
-    myClient1.connectToServer(server_name2)
+    myClient1.connectToServer(server_name3)
+
+    myClient1.publishArticle(sample_article_1,server_name3)
+
     myClient2.connectToServer(server_name2)
+    myClient3.connectToServer(server_name1)
+    myClient3.connectToServer(server_name3)
     # myClient3.connectToServer(server_name1)
 
-    myClient1.publishArticle(sample_article_1,server_name2)
+    # myClient1.publishArticle(sample_article_2,server_name1)
     # myClient1.publishArticle(sample_article_2,server_name1)
 
     myClient1.getArticles(server_name=server_name1,date=sample_date_1)
