@@ -8,7 +8,9 @@ message GetArticlesRequest {
     // article info:
     string type = 2;
     string author = 3;
-    Date date = 4;   
+    Date date = 4;  
+    
+    repeated string visited = 5;
 }
 
 message GetArticlesResponse {
@@ -45,6 +47,21 @@ message ServerJoinResponse {
     Status status = 1;
 }
 
+// ClientServerJoinServer Messages;
+
+message ClientServerJoinServerRequest {
+    string server_address =2;
+}
+
+message ClientServerJoinServerResponse {
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+    
+    Status status = 1;
+}
+
 // LeaveServer Messages
 message ServerLeaveRequest {
     string client_uuid = 1;
@@ -62,6 +79,8 @@ message ServerLeaveResponse {
 service ClientServer {
     rpc GetArticles (GetArticlesRequest) returns (GetArticlesResponse);
     rpc PublishArticle (PublishArticleRequest) returns (PublishArticleResponse);
+
+    rpc ClientServerJoinServer (ClientServerJoinServerRequest) returns (ClientServerJoinServerResponse);
 
     // Manvi RPCs
     rpc JoinServer (ServerJoinRequest) returns (ServerJoinResponse);
