@@ -6,10 +6,12 @@ import registry_server_service_pb2 as rs_proto
 
 from Article_pb2 import Article, Date
 
-sample_date_1 = Date(date=1, month=1, year=2023)
+
+sample_article_1 = Article(id=1, author="Jane", content="hello world", sports="SPORTS")
+sample_article_2 = Article(id=1, author="Jane", content="hello world", fashion="FASHION")
 
 
-sample_article_1 = Article(id=1, author="Jane", time=sample_date_1, content="hello world")
+ARTICLE_TYPE = {'S': 'sports', 'F': 'fashion', 'P': 'politics'}
 
 
 class Client(object):
@@ -72,6 +74,9 @@ class Client(object):
             body=request)
         self.connection.process_data_events(time_limit=None)
 
+        if not self.response:
+            return "FAILED"
+
         response = server_proto.ConnectionResponse()
         response.ParseFromString(self.response)
         return response
@@ -90,7 +95,10 @@ class Client(object):
                 correlation_id=self.corr_id,
             ),
             body=request)
-        self.connection.process_data_events(time_limit=None)
+        self.connection.process_data_events(time_limit=5)
+
+        if not self.response:
+            return "FAILED"
 
         response = server_proto.ConnectionResponse()
         response.ParseFromString(self.response)
@@ -110,9 +118,12 @@ class Client(object):
                 correlation_id=self.corr_id,
             ),
             body=request)
-        self.connection.process_data_events(time_limit=None)
+        self.connection.process_data_events(time_limit=5)
 
-        response = server_proto.ConnectionResponse()
+        if not self.response:
+            return
+
+        response = server_proto.GetArticlesResponse()
         response.ParseFromString(self.response)
         return response
     
@@ -132,33 +143,60 @@ class Client(object):
             body=request)
         self.connection.process_data_events(time_limit=None)
 
-        response = server_proto.ConnectionResponse()
+        if not self.response:
+            return "FAILED: oops"
+
+        response = server_proto.PublishArticleResponse()
         response.ParseFromString(self.response)
         return response
 
 
 myClient = Client()
+print("Starting Client...\n")
+print("Client ID: ", myClient.id)
 
 while(True):
-    print("GetServerList[1], JoinServer[2], LeaveServer[3], GetArticles[4], PublishArticle[5]:")
+    print("\nGetServerList[1], JoinServer[2], LeaveServer[3], GetArticles[4], PublishArticle[5]")
+    
     n = int(input())
-
     if n == 1:
-        print(myClient.GetServerList())
-
+        server_list = myClient.GetServerList().servers
+        for server_name in server_list.keys():
+            print(server_name + " - " + server_list[server_name])
+    elif n > 5:
+        print("INVALID REQUEST")
     else:
         port = input("Enter server port: ")
-
         if n == 2:
             print(myClient.JoinServer(port))
-        
         elif n == 3:
             print(myClient.LeaveServer(port))
-        
         elif n == 4:
-            # TODO: take input
-            print(myClient.GetArticles(port))
-        
-        else:
+            # Assuming valid input
+            date = input("Enter date (dd/mm/yyyy): ")
+            article_type = input("Enter type (Sports(S), fashion(F), politics(P): ")
+            author = input("Enter author: ")
+            
+            if date != '':
+                date = Date(date=int(date.split("/")[0]), month=int(date.split('/')[1]), year=int(date.split('/')[2]))
+            else:
+                date = None
+            if article_type in ARTICLE_TYPE.keys():
+                article_type = ARTICLE_TYPE[article_type]
+                
+            articles = myClient.GetArticles(port, date, article_type, author)
+            if articles:
+                articles = articles.article_list
+                count = 1
+                for article in articles:
+                    print(count)
+                    print(article.WhichOneof('type'))
+                    print(article.author)
+                    print(str(article.time.date) + '/' + str(article.time.month) + '/' + str(article.time.month))
+                    print(article.content)
+                    count += 1
+        elif n == 5:
             article = sample_article_1
             print(myClient.PublishArticle(port, article))
+            # print(myClient.PublishArticle(port, sample_article_2))
+
