@@ -15,14 +15,14 @@ max_clients = 10
 
 class Server:
 
-    def __init__(self, port):
+    def __init__(self, port, name):
         self.address = "localhost"
-        self.port = port                        # str
+        self.port = port                        # str - Assuming unique port
         self.hosted_articles = []               # Article[]
         self.subscribers = []                   # Client[]
         self.clientele = []                     # Client[]
 
-        self.name = "server_" + port
+        self.name = name
 
         # Establish connection
         self.connection = pika.BlockingConnection(
@@ -31,8 +31,8 @@ class Server:
 
         # Declare queues
         self.response_queue = self.channel.queue_declare(queue='')
-        self.article_queue = self.channel.queue_declare(queue=self.name + "_article")
-        self.connection_queue = self.channel.queue_declare(queue=self.name + "_connection")
+        self.article_queue = self.channel.queue_declare(queue="server_" + self.port + "_article")
+        self.connection_queue = self.channel.queue_declare(queue="server_" + self.port + "_connection")
 
     
     def __getRegistryServerRequest(self):
@@ -40,9 +40,9 @@ class Server:
 
     def start(self):
         if not self.__isRegistered():
-            print("FAIL")
+            print("FAIL\n")
         else:
-            print("SUCCESS")
+            print("SUCCESS\n")
             self.__serve()
 
     def __isRegistered(self)->bool:
@@ -85,11 +85,10 @@ class Server:
     def __serve(self):
         self.channel.basic_qos(prefetch_count=1)
 
-        self.channel.basic_consume(queue=self.name + "_connection", on_message_callback=self.__handleConnectionRequest)
-        self.channel.basic_consume(queue=self.name + "_article", on_message_callback=self.__handleArticleRequest)
+        self.channel.basic_consume(queue="server_" + self.port + "_connection", on_message_callback=self.__handleConnectionRequest)
+        self.channel.basic_consume(queue="server_" + self.port + "_article", on_message_callback=self.__handleArticleRequest)
 
         self.channel.start_consuming()
-        # Act as server
 
 
     def __handleConnectionRequest(self, ch, method, props, body):
@@ -121,10 +120,13 @@ class Server:
         ch.basic_ack(delivery_tag=method.delivery_tag)  
 
     def __handleArticleRequest(self, ch, method, props, body):
-        try:
+        request = server_proto.GetArticlesRequest()
+        request.ParseFromString(body)
+
+        if request.is_get:
             request = server_proto.GetArticlesRequest()
             request.ParseFromString(body)
-
+            print(request)
             ch.basic_publish(exchange='',
                 routing_key=props.reply_to,
                 properties=pika.BasicProperties(correlation_id = \
@@ -132,7 +134,7 @@ class Server:
                 body=self.__getArticles(request))
 
 
-        except DecodeError:
+        else:
             request = server_proto.PublishArticleRequest()
             request.ParseFromString(body)
             ch.basic_publish(exchange='',
@@ -191,7 +193,7 @@ class Server:
     def __filterArticles3(self, time, author, article_type):
         filtered = []
         for article in self.hosted_articles:
-            if self.__compareTime(article.time, time) and article.author == author and article.WhichOneof('config') == article_type:
+            if self.__compareTime(article.time, time) and article.author == author and article.WhichOneof('type') == article_type:
                 filtered.append(article)
         return filtered
      
@@ -199,33 +201,48 @@ class Server:
     def __getArticles(self, request):
         # Assuming a valid request
         print('ARTICLES REQUEST FROM', request.client_uuid)
-
         filtered = []
         if request.client_uuid not in self.clientele:
-            return server_proto.GetArticlesResponse(article_list=filtered).SerializeToString()
+            return server_proto.ConnectionResponse(status=server_proto.ConnectionResponse.Status.FAILED).SerializeToString()
 
-        if request.date and request.author and request.type:
-            filtered = self.__filterArticles3(request.date, request.author, request.type)
-        elif request.date and request.author:
-            filtered = self.__filterArticles2(request.date, request.author)
+        date = request.date
+        if request.date and (request.date.year == 0 or request.date.month == 0 or request.date.date == 0):
+            date = None
+        if date and request.author and request.type:
+            filtered = self.__filterArticles3(date, request.author, request.type)
+        elif date and request.author:
+            filtered = self.__filterArticles2(date, request.author)
+        elif date:
+            filtered = self.__filterArticles1(date)
         else:
-            filtered = self.__filterArticles1(request.date)
+            filtered = self.hosted_articles
 
         return server_proto.GetArticlesResponse(article_list=filtered).SerializeToString()
     
     def __publishArticle(self, request):
         print('ARTICLES PUBLISH FROM', request.client_uuid)
+
         if request.client_uuid not in self.clientele:
+            # print("OHNO")
             return server_proto.PublishArticleResponse(status=server_proto.PublishArticleResponse.Status.FAILED).SerializeToString()
-        print("article request",str(request.article))
+        
         today_date = date.today()
         date_object = Date(date=int(today_date.day), month=int(today_date.month),year=int(today_date.year))
-        print(date_object)
-        article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content)
+        if (request.article.WhichOneof('type') == "sports"):
+            article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content, sports="SPORTS")
+        elif (request.article.WhichOneof('type') == "fashion"):
+            article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content, fashion="FASHION")
+        else:
+            article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content, politics="POLITICS")
+
         self.hosted_articles.append(article)
-        print(self.hosted_articles)
         return server_proto.PublishArticleResponse(status=server_proto.PublishArticleResponse.Status.SUCCESS).SerializeToString()
 
 
-s = Server("8000")
-s.start()
+
+name = input("Enter name: ")
+port = input("Enter port: ") # Assuming valid input
+max_clients = int(input("Enter MAXCLIENTS: "))  # Assuming valid input
+
+print("Starting Server...\n")
+Server(port, name).start()

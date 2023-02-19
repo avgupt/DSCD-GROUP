@@ -7,7 +7,7 @@ import signal
 import time
 
 
-max_servers = 10
+max_servers = 2
 servers = {}
 
 class RegisterServer:
@@ -41,7 +41,8 @@ class RegisterServer:
         print("JOIN REQUEST FROM", address)
         if len(servers) < max_servers:
             servers[server_name] = address
-            print("Server registered to RegistryServer, server name:",server_name)
+            # print(len(servers))
+            # print("Server registered to RegistryServer, server name:", server_name)
             return registry_server_service_pb2.RegisterServerResponse(status=registry_server_service_pb2.Status.SUCCESS).SerializeToString()
         return registry_server_service_pb2.RegisterServerResponse(status=registry_server_service_pb2.Status.FAILED).SerializeToString()
 

@@ -5,8 +5,8 @@ import registry_server_service_pb2 as proto
 
 class RegistryServer:
 
-    def __init__(self) -> None:
-        self.max_servers = 10
+    def __init__(self, max_servers) -> None:
+        self.max_servers = max_servers
         self.servers = {}
 
         self.connection = pika.BlockingConnection(
@@ -56,7 +56,6 @@ class RegistryServer:
         print("JOIN REQUEST FROM", address)
         if len(self.servers) < self.max_servers:
             self.servers[server_name] = address
-            print(self.servers)
             return proto.RegisterServerResponse(status=proto.Status.SUCCESS).SerializeToString()
         return proto.RegisterServerResponse(status=proto.Status.FAILED).SerializeToString()
 
@@ -64,4 +63,7 @@ class RegistryServer:
         print("SERVICE LIST REQUEST FROM", request.client_uuid)
         return proto.GetServerListResponse(servers=self.servers).SerializeToString()
 
-rs = RegistryServer()
+print("Starting Registry Server...\n")
+
+max_servers = int(input("Enter MAXSERVERS: "))  # Assuming valid input
+RegistryServer(max_servers)
