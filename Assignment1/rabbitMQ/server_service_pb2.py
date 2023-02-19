@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 import Article_pb2 as Article__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14server_service.proto\x1a\rArticle.proto\"\\\n\x12GetArticlesRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x03 \x01(\t\x12\x13\n\x04\x64\x61te\x18\x04 \x01(\x0b\x32\x05.Date\"5\n\x13GetArticlesResponse\x12\x1e\n\x0c\x61rticle_list\x18\x01 \x03(\x0b\x32\x08.Article\"G\n\x15PublishArticleRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\x12\x19\n\x07\x61rticle\x18\x02 \x01(\x0b\x32\x08.Article\"k\n\x16PublishArticleResponse\x12.\n\x06status\x18\x01 \x01(\x0e\x32\x1e.PublishArticleResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\"<\n\x11\x43onnectionRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\x12\x12\n\nis_joining\x18\x02 \x01(\x08\"c\n\x12\x43onnectionResponse\x12*\n\x06status\x18\x01 \x01(\x0e\x32\x1a.ConnectionResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14server_service.proto\x1a\rArticle.proto\"l\n\x12GetArticlesRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x03 \x01(\t\x12\x13\n\x04\x64\x61te\x18\x04 \x01(\x0b\x32\x05.Date\x12\x0e\n\x06is_get\x18\x05 \x01(\x08\"5\n\x13GetArticlesResponse\x12\x1e\n\x0c\x61rticle_list\x18\x01 \x03(\x0b\x32\x08.Article\"W\n\x15PublishArticleRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\x12\x19\n\x07\x61rticle\x18\x02 \x01(\x0b\x32\x08.Article\x12\x0e\n\x06is_get\x18\x05 \x01(\x08\"k\n\x16PublishArticleResponse\x12.\n\x06status\x18\x01 \x01(\x0e\x32\x1e.PublishArticleResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\"<\n\x11\x43onnectionRequest\x12\x13\n\x0b\x63lient_uuid\x18\x01 \x01(\t\x12\x12\n\nis_joining\x18\x02 \x01(\x08\"c\n\x12\x43onnectionResponse\x12*\n\x06status\x18\x01 \x01(\x0e\x32\x1a.ConnectionResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'server_service_pb2', globals())
@@ -22,19 +22,19 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _GETARTICLESREQUEST._serialized_start=39
-  _GETARTICLESREQUEST._serialized_end=131
-  _GETARTICLESRESPONSE._serialized_start=133
-  _GETARTICLESRESPONSE._serialized_end=186
-  _PUBLISHARTICLEREQUEST._serialized_start=188
-  _PUBLISHARTICLEREQUEST._serialized_end=259
-  _PUBLISHARTICLERESPONSE._serialized_start=261
-  _PUBLISHARTICLERESPONSE._serialized_end=368
-  _PUBLISHARTICLERESPONSE_STATUS._serialized_start=335
-  _PUBLISHARTICLERESPONSE_STATUS._serialized_end=368
-  _CONNECTIONREQUEST._serialized_start=370
-  _CONNECTIONREQUEST._serialized_end=430
-  _CONNECTIONRESPONSE._serialized_start=432
-  _CONNECTIONRESPONSE._serialized_end=531
-  _CONNECTIONRESPONSE_STATUS._serialized_start=335
-  _CONNECTIONRESPONSE_STATUS._serialized_end=368
+  _GETARTICLESREQUEST._serialized_end=147
+  _GETARTICLESRESPONSE._serialized_start=149
+  _GETARTICLESRESPONSE._serialized_end=202
+  _PUBLISHARTICLEREQUEST._serialized_start=204
+  _PUBLISHARTICLEREQUEST._serialized_end=291
+  _PUBLISHARTICLERESPONSE._serialized_start=293
+  _PUBLISHARTICLERESPONSE._serialized_end=400
+  _PUBLISHARTICLERESPONSE_STATUS._serialized_start=367
+  _PUBLISHARTICLERESPONSE_STATUS._serialized_end=400
+  _CONNECTIONREQUEST._serialized_start=402
+  _CONNECTIONREQUEST._serialized_end=462
+  _CONNECTIONRESPONSE._serialized_start=464
+  _CONNECTIONRESPONSE._serialized_end=563
+  _CONNECTIONRESPONSE_STATUS._serialized_start=367
+  _CONNECTIONRESPONSE_STATUS._serialized_end=400
 # @@protoc_insertion_point(module_scope)
