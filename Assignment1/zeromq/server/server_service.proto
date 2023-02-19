@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+import "protos/Article/Article.proto";
+
+message GetArticlesRequest {
+    string client_uuid = 1;
+
+    // article info:
+    string type = 2;
+    string author = 3;
+    Date date = 4;   
+}
+
+message GetArticlesResponse {
+    repeated Article article_list = 1;
+}
+
+message PublishArticleRequest {
+    string client_uuid = 1;
+    Article article = 2;
+}
+
+message PublishArticleResponse {
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+
+    Status status = 1;
+}
+
+
+message ServerJoinRequest {
+    string client_uuid = 1;
+}
+
+message ServerJoinResponse {
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+    
+    Status status = 1;
+}
+
+message ServerLeaveRequest {
+    string client_uuid = 1;
+}
+
+message ServerLeaveResponse {
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+    
+    Status status = 1;
+}
