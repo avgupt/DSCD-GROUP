@@ -77,7 +77,7 @@ class Client:
     def getArticles(self, server_name ,date=None, type=None, author=None):
         server_list = self.getServerListFromRegistryServer().servers
         server_address = server_list[server_name]
-        request = server_pb2.GetArticlesRequest(client_uuid=self.id, date=date,type=type,author=author, fname="publishArticle").SerializeToString()
+        request = server_pb2.GetArticlesRequest(client_uuid=self.id, date=date,type=type,author=author, fname="getArticles").SerializeToString()
         context = zmq.Context()
         client = context.socket(zmq.REQ)
         client.connect("tcp://"+server_address)

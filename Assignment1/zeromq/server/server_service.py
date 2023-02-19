@@ -80,7 +80,7 @@ class Server:
             elif "getArticles" in m2:   
                 request = server_pb2.GetArticlesRequest()
                 request.ParseFromString(message[-1])
-                server.send(self.getArticles(request))
+                server.send(self.GetArticles(request))
             
             else:   
                 request = server_pb2.PublishArticleRequest()
@@ -128,7 +128,7 @@ class Server:
         else:
             filtered = self.filterArticles1(request.date)
 
-        return server_pb2.GetArticlesResponse(article_list=filtered)
+        return server_pb2.GetArticlesResponse(article_list=filtered).SerializeToString()
     
     def PublishArticle(self, request):
         print('ARTICLES PUBLISH FROM', request.client_uuid)
