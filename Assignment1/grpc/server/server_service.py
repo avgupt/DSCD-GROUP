@@ -83,13 +83,10 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
         print('ARTICLES PUBLISH FROM', request.client_uuid)
         if (request.client_uuid not in clientele):
             return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.FAILED)
-        print("article request",str(request.article))
         today_date = date.today()
         date_object = Date(date=int(today_date.day), month=int(today_date.month),year=int(today_date.year))
-        print(date_object)
         article =  Article(id=request.article.id, author=request.article.author, time=date_object, content=request.article.content)
         hosted_articles.append(article)
-        print(hosted_articles)
         return server_pb2.PublishArticleResponse(status=server_pb2.PublishArticleResponse.Status.SUCCESS)
 
     def JoinServer(self, request, context):
@@ -152,7 +149,10 @@ class Server:
             stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
             
             response = stub.RegisterServer(registry_server_service_pb2.RegisterServerRequest(server_name=self.name,ip=self.address,port=int(self.port)))
-        print(response)
+            if response.status == registry_server_service_pb2.Status.SUCCESS:
+                print("SUCCESS")
+            else:
+                print("FAILED")
         return response.status
     
     def __serve(self):

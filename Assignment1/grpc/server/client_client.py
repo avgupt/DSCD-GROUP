@@ -14,6 +14,16 @@ import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
 import argparse
 
+sample_date_1 = Date(date=1, month=1, year=2023)
+sample_date_2 = Date(date=8, month=1, year=2023)
+sample_date_3 = Date(date=16, month=2, year=2023)
+sample_date_4 = Date(date=21, month=3, year=2023)
+
+sample_article_1 = Article(id=1, author="Jane", content="hello world")
+sample_article_2 = Article(id=2, author="John", content="hello world1")
+sample_article_3 = Article(id=3, author="Jolly", content="hello world2")
+sample_article_4 = Article(id=4, author="Jan",  content="hello world3")
+
 class Client:
 
     def __init__(self,server_name=None):
@@ -43,13 +53,19 @@ class Client:
                 with grpc.insecure_channel(client_address) as channel:
                     stub = server_pb2_grpc.ClientServerStub(channel)
                     response = stub.ClientServerJoinServer(server_pb2.ClientServerJoinServerRequest(server_address=server_address))
-                    print(response)
+                    if response.status is server_pb2.ClientServerJoinServerResponse.Status.SUCCESS:
+                        print("SUCCESS")
+                    else:
+                        print("FAILED")
                     channel.close()
         else:
             with grpc.insecure_channel(server_address) as channel:
                 stub = server_pb2_grpc.ClientServerStub(channel)
                 response = stub.JoinServer(server_pb2.ServerJoinRequest(client_uuid=self.id,is_server=self.client_is_server))
-                print(response)
+                if response.status is server_pb2.ServerJoinResponse.Status.SUCCESS:
+                    print("SUCCESS")
+                else:
+                    print("FAILED")
                 channel.close()
 
     def leaveServer(self, server_name):
@@ -58,7 +74,10 @@ class Client:
         with grpc.insecure_channel(server_address) as channel:
             stub = server_pb2_grpc.ClientServerStub(channel)
             response = stub.LeaveServer(server_pb2.ServerLeaveRequest(client_uuid=self.id))
-            print(response)
+            if response.status is server_pb2.ServerLeaveResponse.Status.SUCCESS:
+                print("SUCCESS")
+            else:
+                print("FAILED")
             channel.close()
 
     def publishArticle(self, sample_article, server_name):
@@ -68,7 +87,10 @@ class Client:
         with grpc.insecure_channel(server_address , options=(('grpc.enable_http_proxy', 0),)) as channel:
             stub = server_pb2_grpc.ClientServerStub(channel)
             response = stub.PublishArticle(server_pb2.PublishArticleRequest(client_uuid=self.id, article=sample_article))
-            print(response)
+            if response.status is server_pb2.PublishArticleResponse.Status.SUCCESS:
+                print("SUCCESS")
+            else:
+                print("FAILED")
             channel.close()
     
     def getArticles(self, server_name ,date=None, type=None, author=None):
@@ -88,3 +110,33 @@ if __name__== "__main__":
     args = parser.parse_args()
     server = args.server
     myClient = Client(server_name=server)
+
+    while(True):
+        print("GetServerList[1], JoinServer[2], LeaveServer[3], GetArticles[4], PublishArticle[5]:")
+        n = int(input())
+
+        if n == 1:
+            myClient.getServerListFromRegistryServer()
+
+        else:
+            server_name = input("Enter server name: ")
+
+            if n == 2:
+                myClient.connectToServer(server_name)
+            
+            elif n == 3:
+                myClient.leaveServer(server_name)
+            
+            elif n == 4:
+                myClient.getArticles(server_name=server_name,date=sample_date_1)
+            
+            else:
+                article_num = int(input("Enter article number: "))
+                article = sample_article_4
+                if article_num == 1:
+                    article = sample_article_1
+                elif article_num == 2:
+                    article = sample_article_2
+                elif article == 3:
+                    article = sample_article_3
+                myClient.publishArticle(article,server_name)
