@@ -12,7 +12,7 @@ import logging
 import registry_server_service_pb2 as registry_server_service_pb2
 import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
-
+import argparse
 
 class Client:
 
@@ -82,3 +82,9 @@ class Client:
             print(response.article_list)
             channel.close()
 
+if __name__== "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-server", help="Server name")
+    args = parser.parse_args()
+    server = args.server
+    myClient = Client(server_name=server)
