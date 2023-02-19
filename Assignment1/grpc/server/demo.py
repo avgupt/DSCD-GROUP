@@ -39,10 +39,14 @@ if __name__ == "__main__":
 
     myClient1.connectToServer(server_name1)
     myClient1.connectToServer(server_name2)
-    myClient2.connectToServer(server_name2)
-    # myClient3.connectToServer(server_name1)
 
     myClient1.publishArticle(sample_article_1,server_name2)
+
+    myClient2.connectToServer(server_name2)
+    myClient3.connectToServer(server_name1)
+    # myClient3.connectToServer(server_name1)
+
+    myClient1.publishArticle(sample_article_2,server_name1)
     # myClient1.publishArticle(sample_article_2,server_name1)
 
     myClient1.getArticles(server_name=server_name1,date=sample_date_1)

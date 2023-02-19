@@ -24,6 +24,11 @@ class ClientServerStub(object):
                 request_serializer=grpc_dot_server_dot_server__service__pb2.PublishArticleRequest.SerializeToString,
                 response_deserializer=grpc_dot_server_dot_server__service__pb2.PublishArticleResponse.FromString,
                 )
+        self.ClientServerJoinServer = channel.unary_unary(
+                '/ClientServer/ClientServerJoinServer',
+                request_serializer=grpc_dot_server_dot_server__service__pb2.ClientServerJoinServerRequest.SerializeToString,
+                response_deserializer=grpc_dot_server_dot_server__service__pb2.ClientServerJoinServerResponse.FromString,
+                )
         self.JoinServer = channel.unary_unary(
                 '/ClientServer/JoinServer',
                 request_serializer=grpc_dot_server_dot_server__service__pb2.ServerJoinRequest.SerializeToString,
@@ -46,6 +51,12 @@ class ClientServerServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def PublishArticle(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ClientServerJoinServer(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -76,6 +87,11 @@ def add_ClientServerServicer_to_server(servicer, server):
                     servicer.PublishArticle,
                     request_deserializer=grpc_dot_server_dot_server__service__pb2.PublishArticleRequest.FromString,
                     response_serializer=grpc_dot_server_dot_server__service__pb2.PublishArticleResponse.SerializeToString,
+            ),
+            'ClientServerJoinServer': grpc.unary_unary_rpc_method_handler(
+                    servicer.ClientServerJoinServer,
+                    request_deserializer=grpc_dot_server_dot_server__service__pb2.ClientServerJoinServerRequest.FromString,
+                    response_serializer=grpc_dot_server_dot_server__service__pb2.ClientServerJoinServerResponse.SerializeToString,
             ),
             'JoinServer': grpc.unary_unary_rpc_method_handler(
                     servicer.JoinServer,
@@ -128,6 +144,23 @@ class ClientServer(object):
         return grpc.experimental.unary_unary(request, target, '/ClientServer/PublishArticle',
             grpc_dot_server_dot_server__service__pb2.PublishArticleRequest.SerializeToString,
             grpc_dot_server_dot_server__service__pb2.PublishArticleResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ClientServerJoinServer(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ClientServer/ClientServerJoinServer',
+            grpc_dot_server_dot_server__service__pb2.ClientServerJoinServerRequest.SerializeToString,
+            grpc_dot_server_dot_server__service__pb2.ClientServerJoinServerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
