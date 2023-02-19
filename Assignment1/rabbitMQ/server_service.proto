@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+import "Article.proto";
+
+message GetArticlesRequest {
+    string client_uuid = 1;
+
+    // article info:
+    string type = 2;
+    string author = 3;
+    Date date = 4;   
+}
+
+message GetArticlesResponse {
+    repeated Article article_list = 1;
+}
+
+message PublishArticleRequest {
+    string client_uuid = 1;
+    Article article = 2;
+}
+
+message PublishArticleResponse {
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+
+    Status status = 1;
+}
+
+// Connection Messages;
+
+message ConnectionRequest {
+    string client_uuid = 1;
+    bool is_joining = 2;
+}
+
+message ConnectionResponse {
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+    
+    Status status = 1;
+}
