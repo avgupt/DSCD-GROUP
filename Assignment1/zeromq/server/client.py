@@ -115,6 +115,7 @@ print("Starting Client...\n")
 print("Client ID: ", myClient.id)
 
 while(True):
+    id = 1
     print("\nGetServerList[1], JoinServer[2], LeaveServer[3], GetArticles[4], PublishArticle[5]")
     
     n = int(input())
@@ -136,12 +137,15 @@ while(True):
             article_type = input("Enter type (Sports(S), fashion(F), politics(P): ")
             author = input("Enter author: ")
             
-            if date != '':
-                date = Date(date=int(date.split("/")[0]), month=int(date.split('/')[1]), year=int(date.split('/')[2]))
-            else:
-                date = None
+            if (date == ''): date = "10/01/2001"
+            date = Date(date=int(date.split("/")[0]), month=int(date.split('/')[1]), year=int(date.split('/')[2]))
             if article_type in ARTICLE_TYPE.keys():
                 article_type = ARTICLE_TYPE[article_type]
+            else:
+                article_type = None
+
+            if (author == ""):
+                author = None
                 
             articles = myClient.getArticles(port, date, article_type, author)
             if articles:
@@ -155,5 +159,10 @@ while(True):
                     print(article.content)
                     count += 1
         elif n == 5:
+            # article_type = input("Enter type (Sports(S), fashion(F), politics(P): ")
+            # author = input("Enter author: ")
+            # content = input("Enter content:")
+            # sample_article = Article(id+=1, author="Jane", content="hello world", sports="SPORTS")
+    
             article = sample_article_1
             print(myClient.publishArticle(article, port))
