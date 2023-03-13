@@ -24,21 +24,28 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
         request_articles_date_object = datetime.datetime(request_articles_time.year, request_articles_time.month, request_articles_time.date)
         return article_date_object >= request_articles_date_object
 
-    def filterArticles1(self, time):
+    def filterArticlesTime(self, time):
         filtered = []
         for article in hosted_articles:
             if self.compareTime(article.time, time):
                 filtered.append(article)
         return filtered
     
-    def filterArticles2(self, time, author):
+    def filterArticlesAuthorAndTime(self, time, author):
         filtered = []
         for article in hosted_articles:
             if self.compareTime(article.time, time) and article.author == author:
                 filtered.append(article)
         return filtered
 
-    def filterArticles3(self, time, author, article_type):
+    def filterArticlesTypeAndTime(self, time, article_type):
+        filtered = []
+        for article in hosted_articles:
+            if self.compareTime(article.time, time) and article.WhichOneof('type') == article_type:
+                filtered.append(article)
+        return filtered 
+
+    def filterArticlesAuthorAndTimeAndType(self, time, author, article_type):
         filtered = []
         for article in hosted_articles:
             if self.compareTime(article.time, time) and article.author == author and article.WhichOneof('type') == article_type:
@@ -60,11 +67,13 @@ class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
             return server_pb2.GetArticlesResponse(article_list=filtered)
 
         if request.date and request.author and request.type:
-            filtered = self.filterArticles3(request.date, request.author, request.type)
+            filtered = self.filterArticlesAuthorAndTimeAndType(request.date, request.author, request.type)
         elif request.date and request.author:
-            filtered = self.filterArticles2(request.date, request.author)
+            filtered = self.filterArticlesAuthorAndTime(request.date, request.author)
+        elif request.date and request.type:
+            filtered = self.filterArticlesTypeAndTime(request.date, request.type)
         else:
-            filtered = self.filterArticles1(request.date)
+            filtered = self.filterArticlesTime(request.date)
 
         for server_address in subscribed_to:
             response = self.getArticlesFromJoinedServer(server_address,visited,request.date,request.author,request.type)
