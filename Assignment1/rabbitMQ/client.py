@@ -180,7 +180,7 @@ while(True):
             if date != '':
                 date = Date(date=int(date.split("/")[0]), month=int(date.split('/')[1]), year=int(date.split('/')[2]))
             else:
-                date = None
+                date = Date(date=1, month=1, year=2001)
             if article_type in ARTICLE_TYPE.keys():
                 article_type = ARTICLE_TYPE[article_type]
                 

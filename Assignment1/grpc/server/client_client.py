@@ -136,12 +136,16 @@ if __name__== "__main__":
                 article_type = input("Enter type (Sports(S), fashion(F), politics(P): ")
                 author = input("Enter author: ")
 
-                if date != '':
-                    date = Date(date=int(date.split("/")[0]), month=int(date.split('/')[1]), year=int(date.split('/')[2]))
-                else:
-                    date = None
+                if (date == ''): date = "10/01/2001"
+                date = Date(date=int(date.split("/")[0]), month=int(date.split('/')[1]), year=int(date.split('/')[2]))
+
                 if article_type in ARTICLE_TYPE.keys():
                     article_type = ARTICLE_TYPE[article_type]
+                else:
+                    article_type = None
+
+                if (author == ""):
+                    author = None
                 
                 myClient.getArticles(server_name=server_name,date=date,author=author,type=article_type)
 

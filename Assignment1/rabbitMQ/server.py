@@ -126,7 +126,7 @@ class Server:
         if request.is_get:
             request = server_proto.GetArticlesRequest()
             request.ParseFromString(body)
-            print(request)
+            # print(request)
             ch.basic_publish(exchange='',
                 routing_key=props.reply_to,
                 properties=pika.BasicProperties(correlation_id = \
@@ -176,21 +176,28 @@ class Server:
         request_articles_date_object = datetime.datetime(request_articles_time.year, request_articles_time.month, request_articles_time.date)
         return article_date_object >= request_articles_date_object
 
-    def __filterArticles1(self, time):
+    def __filterArticlesTime(self, time):
         filtered = []
         for article in self.hosted_articles:
             if self.__compareTime(article.time, time):
                 filtered.append(article)
         return filtered
     
-    def __filterArticles2(self, time, author):
+    def __filterArticlesAuthorAndTime(self, time, author):
         filtered = []
         for article in self.hosted_articles:
             if self.__compareTime(article.time, time) and article.author == author:
                 filtered.append(article)
         return filtered
 
-    def __filterArticles3(self, time, author, article_type):
+    def __filterArticlesTypeAndTime(self, time, article_type):
+        filtered = []
+        for article in self.hosted_articles:
+            if self.__compareTime(article.time, time) and article.WhichOneof('type') == article_type:
+                filtered.append(article)
+        return filtered 
+
+    def __filterArticlesAuthorAndTimeAndType(self, time, author, article_type):
         filtered = []
         for article in self.hosted_articles:
             if self.__compareTime(article.time, time) and article.author == author and article.WhichOneof('type') == article_type:
@@ -206,16 +213,18 @@ class Server:
             return server_proto.ConnectionResponse(status=server_proto.ConnectionResponse.Status.FAILED).SerializeToString()
 
         date = request.date
-        if request.date and (request.date.year == 0 or request.date.month == 0 or request.date.date == 0):
-            date = None
+        #  None date handled in input
+        # if request.date and (request.date.year == 0 or request.date.month == 0 or request.date.date == 0):
+        #     date = None
+
         if date and request.author and request.type:
-            filtered = self.__filterArticles3(date, request.author, request.type)
+            filtered = self.__filterArticlesAuthorAndTimeAndType(date, request.author, request.type)
         elif date and request.author:
-            filtered = self.__filterArticles2(date, request.author)
-        elif date:
-            filtered = self.__filterArticles1(date)
+            filtered = self.__filterArticlesAuthorAndTime(date, request.author)
+        elif request.date and request.type:
+            filtered = self.__filterArticlesTypeAndTime(request.date, request.type)
         else:
-            filtered = self.hosted_articles
+            self.__filterArticlesTime(request.date)
 
         return server_proto.GetArticlesResponse(article_list=filtered).SerializeToString()
     
