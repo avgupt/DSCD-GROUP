@@ -114,19 +114,6 @@ class Server:
                 filtered.append(article)
         return filtered 
 
-    # def filterArticles1(self, time):
-    #     filtered = []
-    #     for article in hosted_articles:
-    #         if self.compareTime(article.time, time):
-    #             filtered.append(article)
-    #     return filtered
-    
-    # def filterArticles2(self, time, author):
-    #     filtered = []
-    #     for article in hosted_articles:
-    #         if self.compareTime(article.time, time) and article.author == author:
-    #             filtered.append(article)
-    #     return filtered
 
     def filterArticlesAuthorAndTimeAndType(self, time, author, article_type):
         filtered = []
@@ -141,7 +128,7 @@ class Server:
 
         filtered = []
         if request.client_uuid not in clientele:
-            return server_pb2.GetArticlesResponse(article_list=filtered)
+            return server_pb2.GetArticlesResponse(article_list=filtered).SerializeToString()
         
         if request.date and request.author and request.type:
             filtered = self.filterArticlesAuthorAndTimeAndType(request.date, request.author, request.type)
