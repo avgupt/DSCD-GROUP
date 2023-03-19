@@ -30,6 +30,11 @@ class ServerServiceStub(object):
                 request_serializer=primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
                 response_deserializer=primaryBlocking_dot_status__pb2.Status.FromString,
                 )
+        self.SendReplicaInfoToPrimary = channel.unary_unary(
+                '/ServerService/SendReplicaInfoToPrimary',
+                request_serializer=primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryRequest.SerializeToString,
+                response_deserializer=primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryResponse.FromString,
+                )
 
 
 class ServerServiceServicer(object):
@@ -53,6 +58,12 @@ class ServerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SendReplicaInfoToPrimary(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ServerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -70,6 +81,11 @@ def add_ServerServiceServicer_to_server(servicer, server):
                     servicer.delete,
                     request_deserializer=primaryBlocking_dot_server__service__pb2.FileRequest.FromString,
                     response_serializer=primaryBlocking_dot_status__pb2.Status.SerializeToString,
+            ),
+            'SendReplicaInfoToPrimary': grpc.unary_unary_rpc_method_handler(
+                    servicer.SendReplicaInfoToPrimary,
+                    request_deserializer=primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryRequest.FromString,
+                    response_serializer=primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -129,5 +145,22 @@ class ServerService(object):
         return grpc.experimental.unary_unary(request, target, '/ServerService/delete',
             primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
             primaryBlocking_dot_status__pb2.Status.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SendReplicaInfoToPrimary(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ServerService/SendReplicaInfoToPrimary',
+            primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryRequest.SerializeToString,
+            primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

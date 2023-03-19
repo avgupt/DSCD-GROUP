@@ -12,9 +12,14 @@ message RegisterReplicaRequest {
   }
 
 message RegisterReplicaResponse {
+   enum Status {
+    FAILED = 0;
+    SUCCESS = 1;
+  }
     bool is_replica_primary = 1;
     string primary_replica_ip = 2;
     int32 primary_replica_port = 3;
+    Status status = 4;
   }
 
 message GetReplicaListRequest {

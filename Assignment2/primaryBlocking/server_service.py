@@ -11,6 +11,17 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
         self.is_primary_replica = is_primary_replica
         self.primary_replica_ip = primary_replica_ip
         self.primary_replica_port = primary_replica_port
+        self.replicas = [] # primary replica not added
+
+    def SendReplicaInfoToPrimary(self, request, context):
+        # TODO(shelly): add case for failure
+        ip = request.ip
+        port = request.port
+        address = ip + ':'+ str(port)
+        print("SEND REPLICA INFO TO PRIMARY REPLICA REQUEST:",address)
+        self.replicas.append(address)
+        return server_pb2.SendReplicaInfoToPrimaryResponse(status=server_pb2.SendReplicaInfoToPrimaryResponse.Status.SUCCESS)
+        
 
 class Server:
 

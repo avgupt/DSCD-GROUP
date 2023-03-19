@@ -7,6 +7,20 @@ service ServerService {
     rpc write (WriteRequest) returns (WriteResponse) {};
     rpc read (FileRequest) returns (ReadResponse) {};
     rpc delete (FileRequest) returns (Status) {};
+    rpc SendReplicaInfoToPrimary(SendReplicaInfoToPrimaryRequest) returns (SendReplicaInfoToPrimaryResponse) {};
+}
+
+message SendReplicaInfoToPrimaryRequest{
+    string ip = 1;
+    int32 port = 2;
+}
+
+message SendReplicaInfoToPrimaryResponse{
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+    Status status = 1;
 }
 
 message WriteRequest {
