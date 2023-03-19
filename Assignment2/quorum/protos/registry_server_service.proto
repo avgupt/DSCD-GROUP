@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+service RegistryServerService {
+    rpc getServers(Request) returns (Response) {};
+}
+
+message Request {
+    enum REQUEST_TYPE {
+        GET = 0;
+        READ = 1;
+        DELETE = 2;
+    }
+
+    REQUEST_TYPE type = 3;
+}
+
+message Server {
+    string ip = 1;
+    string port = 2;
+}
+
+message Response {
+    repeated Server server_list = 1;
+}
