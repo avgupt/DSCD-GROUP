@@ -6,7 +6,7 @@ import server_service_pb2_grpc as server_pb2_grpc
 import registry_server_service_pb2 as registry_server_service_pb2
 import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
-class ClientServerServicer(server_pb2_grpc.ClientServerServicer):
+class ServerServicer(server_pb2_grpc.ClientServerServicer):
     def __init__(self, is_primary_replica, primary_replica_ip, primary_replica_port):
         self.is_primary_replica = is_primary_replica
         self.primary_replica_ip = primary_replica_ip

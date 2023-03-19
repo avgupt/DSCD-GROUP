@@ -2,9 +2,11 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
+from primaryBlocking import server_service_pb2 as primaryBlocking_dot_server__service__pb2
+from primaryBlocking import status_pb2 as primaryBlocking_dot_status__pb2
 
 
-class ClientServerStub(object):
+class ServerServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -13,20 +15,119 @@ class ClientServerStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.write = channel.unary_unary(
+                '/ServerService/write',
+                request_serializer=primaryBlocking_dot_server__service__pb2.WriteRequest.SerializeToString,
+                response_deserializer=primaryBlocking_dot_server__service__pb2.WriteResponse.FromString,
+                )
+        self.read = channel.unary_unary(
+                '/ServerService/read',
+                request_serializer=primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
+                response_deserializer=primaryBlocking_dot_server__service__pb2.ReadResponse.FromString,
+                )
+        self.delete = channel.unary_unary(
+                '/ServerService/delete',
+                request_serializer=primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
+                response_deserializer=primaryBlocking_dot_status__pb2.Status.FromString,
+                )
 
 
-class ClientServerServicer(object):
+class ServerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
+    def write(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
-def add_ClientServerServicer_to_server(servicer, server):
+    def read(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def delete(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_ServerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'write': grpc.unary_unary_rpc_method_handler(
+                    servicer.write,
+                    request_deserializer=primaryBlocking_dot_server__service__pb2.WriteRequest.FromString,
+                    response_serializer=primaryBlocking_dot_server__service__pb2.WriteResponse.SerializeToString,
+            ),
+            'read': grpc.unary_unary_rpc_method_handler(
+                    servicer.read,
+                    request_deserializer=primaryBlocking_dot_server__service__pb2.FileRequest.FromString,
+                    response_serializer=primaryBlocking_dot_server__service__pb2.ReadResponse.SerializeToString,
+            ),
+            'delete': grpc.unary_unary_rpc_method_handler(
+                    servicer.delete,
+                    request_deserializer=primaryBlocking_dot_server__service__pb2.FileRequest.FromString,
+                    response_serializer=primaryBlocking_dot_status__pb2.Status.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'ClientServer', rpc_method_handlers)
+            'ServerService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class ClientServer(object):
+class ServerService(object):
     """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def write(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ServerService/write',
+            primaryBlocking_dot_server__service__pb2.WriteRequest.SerializeToString,
+            primaryBlocking_dot_server__service__pb2.WriteResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def read(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ServerService/read',
+            primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
+            primaryBlocking_dot_server__service__pb2.ReadResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def delete(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ServerService/delete',
+            primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
+            primaryBlocking_dot_status__pb2.Status.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
