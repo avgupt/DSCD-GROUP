@@ -6,7 +6,7 @@ import server_service_pb2_grpc as server_pb2_grpc
 import registry_server_service_pb2 as registry_server_service_pb2
 import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
-class ServerServicer(server_pb2_grpc.ClientServerServicer):
+class ServerServicer(server_pb2_grpc.ServerServiceServicer):
     def __init__(self, is_primary_replica, primary_replica_ip, primary_replica_port):
         self.is_primary_replica = is_primary_replica
         self.primary_replica_ip = primary_replica_ip
@@ -34,8 +34,8 @@ class Server:
     def __serve(self,is_replica_primary,primary_replica_ip,primary_replica_port):
 
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        server_pb2_grpc.add_ClientServerServicer_to_server(
-            ClientServerServicer(is_replica_primary, primary_replica_ip=primary_replica_ip,primary_replica_port=primary_replica_port), server
+        server_pb2_grpc.add_ServerServiceServicer_to_server(
+            ServerServicer(is_replica_primary, primary_replica_ip=primary_replica_ip,primary_replica_port=primary_replica_port), server
         )
         server.add_insecure_port("[::]:" + self.port)
         server.start()
