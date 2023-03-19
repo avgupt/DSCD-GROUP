@@ -1,7 +1,11 @@
 syntax = "proto3";
 
+import "server.proto";
+import "status.proto";
+
 service RegistryServerService {
     rpc getServers(Request) returns (Response) {};
+    rpc connect(Server) returns (Status) {};
 }
 
 message Request {
@@ -12,11 +16,6 @@ message Request {
     }
 
     REQUEST_TYPE type = 3;
-}
-
-message Server {
-    string ip = 1;
-    string port = 2;
 }
 
 message Response {

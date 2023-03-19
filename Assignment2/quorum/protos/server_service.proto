@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import "status.proto";
+import "time_stamp.proto";
+
+service ServerService {
+    rpc write (WriteRequest) returns (WriteResponse) {};
+    rpc read (FileRequest) returns (ReadResponse) {};
+    rpc delete (FileRequest) returns (Status) {};
+}
+
+message WriteRequest {
+    string file_name = 1;
+    string file_content = 2;
+    string uuid = 3;
+}
+
+message WriteResponse {
+    string uuid = 1;
+    TimeStamp version = 2;
+    Status status = 3;
+}
+
+message FileRequest {
+    string uuid = 1;
+}
+
+message ReadResponse {
+    string file_name = 2;
+    string content = 3;
+    TimeStamp version = 4;
+    Status status = 1;
+}

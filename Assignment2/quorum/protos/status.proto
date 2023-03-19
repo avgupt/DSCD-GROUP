@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message Status {
+    enum STATUS_TYPE {
+        SUCCESS = 0;
+        FAILURE = 1;
+    }
+
+    STATUS_TYPE type = 1;
+    string message = 2;
+}

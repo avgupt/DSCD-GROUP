@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message TimeStamp {
+    Date date = 1;
+    Time time = 2;
+}
+
+message Date {
+    int32 day = 1;
+    int32 month = 2;
+    int32 year = 3;
+}
+
+message Time {
+    int32 hour = 1;
+    int32 minute = 2;
+    int32 second = 3;
+}
