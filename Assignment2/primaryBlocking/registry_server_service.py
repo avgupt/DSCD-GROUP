@@ -28,6 +28,10 @@ class RegisterService(registry_server_service_pb2_grpc.RegistryServerServiceServ
         self.servers[replica_name] = address
         print("Replica registered to RegistryServer, replica name:",replica_name)
         return registry_server_service_pb2.RegisterReplicaResponse(is_replica_primary = is_primary_replica, primary_replica_ip = self.primary_replica_ip, primary_replica_port = self.primary_replica_port)
+    
+    def GetReplicaList(self, request, context):
+        print("REPLICA LIST REQUEST")
+        return registry_server_service_pb2.GetReplicaListResponse(servers=self.servers)
 
 
 def serve():

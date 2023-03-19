@@ -13,17 +13,25 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-primaryBlocking/registry_server_service.proto\"H\n\x16RegisterReplicaRequest\x12\x14\n\x0creplica_name\x18\x01 \x01(\t\x12\n\n\x02ip\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\"o\n\x17RegisterReplicaResponse\x12\x1a\n\x12is_replica_primary\x18\x01 \x01(\x08\x12\x1a\n\x12primary_replica_ip\x18\x02 \x01(\t\x12\x1c\n\x14primary_replica_port\x18\x03 \x01(\x05\x32_\n\x15RegistryServerService\x12\x46\n\x0fRegisterReplica\x12\x17.RegisterReplicaRequest\x1a\x18.RegisterReplicaResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-primaryBlocking/registry_server_service.proto\"H\n\x16RegisterReplicaRequest\x12\x14\n\x0creplica_name\x18\x01 \x01(\t\x12\n\n\x02ip\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\"o\n\x17RegisterReplicaResponse\x12\x1a\n\x12is_replica_primary\x18\x01 \x01(\x08\x12\x1a\n\x12primary_replica_ip\x18\x02 \x01(\t\x12\x1c\n\x14primary_replica_port\x18\x03 \x01(\x05\"\x17\n\x15GetReplicaListRequest\"\x7f\n\x16GetReplicaListResponse\x12\x35\n\x07servers\x18\x01 \x03(\x0b\x32$.GetReplicaListResponse.ServersEntry\x1a.\n\x0cServersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32\xa4\x01\n\x15RegistryServerService\x12\x46\n\x0fRegisterReplica\x12\x17.RegisterReplicaRequest\x1a\x18.RegisterReplicaResponse\"\x00\x12\x43\n\x0eGetReplicaList\x12\x16.GetReplicaListRequest\x1a\x17.GetReplicaListResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'primaryBlocking.registry_server_service_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
+  _GETREPLICALISTRESPONSE_SERVERSENTRY._options = None
+  _GETREPLICALISTRESPONSE_SERVERSENTRY._serialized_options = b'8\001'
   _REGISTERREPLICAREQUEST._serialized_start=49
   _REGISTERREPLICAREQUEST._serialized_end=121
   _REGISTERREPLICARESPONSE._serialized_start=123
   _REGISTERREPLICARESPONSE._serialized_end=234
-  _REGISTRYSERVERSERVICE._serialized_start=236
-  _REGISTRYSERVERSERVICE._serialized_end=331
+  _GETREPLICALISTREQUEST._serialized_start=236
+  _GETREPLICALISTREQUEST._serialized_end=259
+  _GETREPLICALISTRESPONSE._serialized_start=261
+  _GETREPLICALISTRESPONSE._serialized_end=388
+  _GETREPLICALISTRESPONSE_SERVERSENTRY._serialized_start=342
+  _GETREPLICALISTRESPONSE_SERVERSENTRY._serialized_end=388
+  _REGISTRYSERVERSERVICE._serialized_start=391
+  _REGISTRYSERVERSERVICE._serialized_end=555
 # @@protoc_insertion_point(module_scope)

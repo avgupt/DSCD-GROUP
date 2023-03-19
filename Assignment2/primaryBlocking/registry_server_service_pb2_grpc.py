@@ -19,12 +19,23 @@ class RegistryServerServiceStub(object):
                 request_serializer=primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaRequest.SerializeToString,
                 response_deserializer=primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaResponse.FromString,
                 )
+        self.GetReplicaList = channel.unary_unary(
+                '/RegistryServerService/GetReplicaList',
+                request_serializer=primaryBlocking_dot_registry__server__service__pb2.GetReplicaListRequest.SerializeToString,
+                response_deserializer=primaryBlocking_dot_registry__server__service__pb2.GetReplicaListResponse.FromString,
+                )
 
 
 class RegistryServerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def RegisterReplica(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetReplicaList(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -37,6 +48,11 @@ def add_RegistryServerServiceServicer_to_server(servicer, server):
                     servicer.RegisterReplica,
                     request_deserializer=primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaRequest.FromString,
                     response_serializer=primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaResponse.SerializeToString,
+            ),
+            'GetReplicaList': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetReplicaList,
+                    request_deserializer=primaryBlocking_dot_registry__server__service__pb2.GetReplicaListRequest.FromString,
+                    response_serializer=primaryBlocking_dot_registry__server__service__pb2.GetReplicaListResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -62,5 +78,22 @@ class RegistryServerService(object):
         return grpc.experimental.unary_unary(request, target, '/RegistryServerService/RegisterReplica',
             primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaRequest.SerializeToString,
             primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetReplicaList(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/RegistryServerService/GetReplicaList',
+            primaryBlocking_dot_registry__server__service__pb2.GetReplicaListRequest.SerializeToString,
+            primaryBlocking_dot_registry__server__service__pb2.GetReplicaListResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

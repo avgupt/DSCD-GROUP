@@ -3,6 +3,7 @@ syntax = "proto3";
 
 service RegistryServerService {
     rpc RegisterReplica (RegisterReplicaRequest) returns (RegisterReplicaResponse) {}
+    rpc GetReplicaList (GetReplicaListRequest) returns (GetReplicaListResponse) {}
   }
 
 message RegisterReplicaRequest {
@@ -15,4 +16,11 @@ message RegisterReplicaResponse {
     bool is_replica_primary = 1;
     string primary_replica_ip = 2;
     int32 primary_replica_port = 3;
+  }
+
+message GetReplicaListRequest {
+  }
+
+message GetReplicaListResponse {
+    map<string, string> servers = 1;
   }

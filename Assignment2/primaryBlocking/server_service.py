@@ -1,7 +1,4 @@
 from concurrent import futures
-from datetime import date
-import logging
-import datetime
 
 import grpc
 import  server_service_pb2 as server_pb2
