@@ -7,4 +7,5 @@ message Status {
     }
 
     STATUS_TYPE type = 1;
+    string message = 2;
 }
