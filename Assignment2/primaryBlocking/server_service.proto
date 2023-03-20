@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-import "primaryBlocking/status.proto";
-import "primaryBlocking/time_stamp.proto";
+import "status.proto";
+import "time_stamp.proto";
 
 service ServerService {
     rpc write (WriteRequest) returns (WriteResponse) {};
@@ -27,6 +27,7 @@ message WriteRequest {
     string file_name = 1;
     string file_content = 2;
     string uuid = 3;
+    int32 is_write_from_client = 4;
 }
 
 message WriteResponse {

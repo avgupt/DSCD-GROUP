@@ -19,7 +19,8 @@ message RegisterReplicaResponse {
     bool is_replica_primary = 1;
     string primary_replica_ip = 2;
     int32 primary_replica_port = 3;
-    Status status = 4;
+    string replica_name = 4;
+    Status status = 5;
   }
 
 message GetReplicaListRequest {

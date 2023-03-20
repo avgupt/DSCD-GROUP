@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-primaryBlocking/registry_server_service.proto\"2\n\x16RegisterReplicaRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"\xc3\x01\n\x17RegisterReplicaResponse\x12\x1a\n\x12is_replica_primary\x18\x01 \x01(\x08\x12\x1a\n\x12primary_replica_ip\x18\x02 \x01(\t\x12\x1c\n\x14primary_replica_port\x18\x03 \x01(\x05\x12/\n\x06status\x18\x04 \x01(\x0e\x32\x1f.RegisterReplicaResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\"\x17\n\x15GetReplicaListRequest\")\n\x16GetReplicaListResponse\x12\x0f\n\x07servers\x18\x01 \x03(\t2\xa4\x01\n\x15RegistryServerService\x12\x46\n\x0fRegisterReplica\x12\x17.RegisterReplicaRequest\x1a\x18.RegisterReplicaResponse\"\x00\x12\x43\n\x0eGetReplicaList\x12\x16.GetReplicaListRequest\x1a\x17.GetReplicaListResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-primaryBlocking/registry_server_service.proto\"2\n\x16RegisterReplicaRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"\xd9\x01\n\x17RegisterReplicaResponse\x12\x1a\n\x12is_replica_primary\x18\x01 \x01(\x08\x12\x1a\n\x12primary_replica_ip\x18\x02 \x01(\t\x12\x1c\n\x14primary_replica_port\x18\x03 \x01(\x05\x12\x14\n\x0creplica_name\x18\x04 \x01(\t\x12/\n\x06status\x18\x05 \x01(\x0e\x32\x1f.RegisterReplicaResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\"\x17\n\x15GetReplicaListRequest\")\n\x16GetReplicaListResponse\x12\x0f\n\x07servers\x18\x01 \x03(\t2\xa4\x01\n\x15RegistryServerService\x12\x46\n\x0fRegisterReplica\x12\x17.RegisterReplicaRequest\x1a\x18.RegisterReplicaResponse\"\x00\x12\x43\n\x0eGetReplicaList\x12\x16.GetReplicaListRequest\x1a\x17.GetReplicaListResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'primaryBlocking.registry_server_service_pb2', globals())
@@ -23,13 +23,13 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _REGISTERREPLICAREQUEST._serialized_start=49
   _REGISTERREPLICAREQUEST._serialized_end=99
   _REGISTERREPLICARESPONSE._serialized_start=102
-  _REGISTERREPLICARESPONSE._serialized_end=297
-  _REGISTERREPLICARESPONSE_STATUS._serialized_start=264
-  _REGISTERREPLICARESPONSE_STATUS._serialized_end=297
-  _GETREPLICALISTREQUEST._serialized_start=299
-  _GETREPLICALISTREQUEST._serialized_end=322
-  _GETREPLICALISTRESPONSE._serialized_start=324
-  _GETREPLICALISTRESPONSE._serialized_end=365
-  _REGISTRYSERVERSERVICE._serialized_start=368
-  _REGISTRYSERVERSERVICE._serialized_end=532
+  _REGISTERREPLICARESPONSE._serialized_end=319
+  _REGISTERREPLICARESPONSE_STATUS._serialized_start=286
+  _REGISTERREPLICARESPONSE_STATUS._serialized_end=319
+  _GETREPLICALISTREQUEST._serialized_start=321
+  _GETREPLICALISTREQUEST._serialized_end=344
+  _GETREPLICALISTRESPONSE._serialized_start=346
+  _GETREPLICALISTRESPONSE._serialized_end=387
+  _REGISTRYSERVERSERVICE._serialized_start=390
+  _REGISTRYSERVERSERVICE._serialized_end=554
 # @@protoc_insertion_point(module_scope)

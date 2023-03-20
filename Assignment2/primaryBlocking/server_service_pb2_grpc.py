@@ -2,8 +2,8 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import server_service_pb2 as primaryBlocking_dot_server__service__pb2
-import status_pb2 as primaryBlocking_dot_status__pb2
+import server_service_pb2 as server__service__pb2
+import status_pb2 as status__pb2
 
 
 class ServerServiceStub(object):
@@ -17,23 +17,23 @@ class ServerServiceStub(object):
         """
         self.write = channel.unary_unary(
                 '/ServerService/write',
-                request_serializer=primaryBlocking_dot_server__service__pb2.WriteRequest.SerializeToString,
-                response_deserializer=primaryBlocking_dot_server__service__pb2.WriteResponse.FromString,
+                request_serializer=server__service__pb2.WriteRequest.SerializeToString,
+                response_deserializer=server__service__pb2.WriteResponse.FromString,
                 )
         self.read = channel.unary_unary(
                 '/ServerService/read',
-                request_serializer=primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
-                response_deserializer=primaryBlocking_dot_server__service__pb2.ReadResponse.FromString,
+                request_serializer=server__service__pb2.FileRequest.SerializeToString,
+                response_deserializer=server__service__pb2.ReadResponse.FromString,
                 )
         self.delete = channel.unary_unary(
                 '/ServerService/delete',
-                request_serializer=primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
-                response_deserializer=primaryBlocking_dot_status__pb2.Status.FromString,
+                request_serializer=server__service__pb2.FileRequest.SerializeToString,
+                response_deserializer=status__pb2.Status.FromString,
                 )
         self.SendReplicaInfoToPrimary = channel.unary_unary(
                 '/ServerService/SendReplicaInfoToPrimary',
-                request_serializer=primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryRequest.SerializeToString,
-                response_deserializer=primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryResponse.FromString,
+                request_serializer=server__service__pb2.SendReplicaInfoToPrimaryRequest.SerializeToString,
+                response_deserializer=server__service__pb2.SendReplicaInfoToPrimaryResponse.FromString,
                 )
 
 
@@ -69,23 +69,23 @@ def add_ServerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'write': grpc.unary_unary_rpc_method_handler(
                     servicer.write,
-                    request_deserializer=primaryBlocking_dot_server__service__pb2.WriteRequest.FromString,
-                    response_serializer=primaryBlocking_dot_server__service__pb2.WriteResponse.SerializeToString,
+                    request_deserializer=server__service__pb2.WriteRequest.FromString,
+                    response_serializer=server__service__pb2.WriteResponse.SerializeToString,
             ),
             'read': grpc.unary_unary_rpc_method_handler(
                     servicer.read,
-                    request_deserializer=primaryBlocking_dot_server__service__pb2.FileRequest.FromString,
-                    response_serializer=primaryBlocking_dot_server__service__pb2.ReadResponse.SerializeToString,
+                    request_deserializer=server__service__pb2.FileRequest.FromString,
+                    response_serializer=server__service__pb2.ReadResponse.SerializeToString,
             ),
             'delete': grpc.unary_unary_rpc_method_handler(
                     servicer.delete,
-                    request_deserializer=primaryBlocking_dot_server__service__pb2.FileRequest.FromString,
-                    response_serializer=primaryBlocking_dot_status__pb2.Status.SerializeToString,
+                    request_deserializer=server__service__pb2.FileRequest.FromString,
+                    response_serializer=status__pb2.Status.SerializeToString,
             ),
             'SendReplicaInfoToPrimary': grpc.unary_unary_rpc_method_handler(
                     servicer.SendReplicaInfoToPrimary,
-                    request_deserializer=primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryRequest.FromString,
-                    response_serializer=primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryResponse.SerializeToString,
+                    request_deserializer=server__service__pb2.SendReplicaInfoToPrimaryRequest.FromString,
+                    response_serializer=server__service__pb2.SendReplicaInfoToPrimaryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -109,8 +109,8 @@ class ServerService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/ServerService/write',
-            primaryBlocking_dot_server__service__pb2.WriteRequest.SerializeToString,
-            primaryBlocking_dot_server__service__pb2.WriteResponse.FromString,
+            server__service__pb2.WriteRequest.SerializeToString,
+            server__service__pb2.WriteResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -126,8 +126,8 @@ class ServerService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/ServerService/read',
-            primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
-            primaryBlocking_dot_server__service__pb2.ReadResponse.FromString,
+            server__service__pb2.FileRequest.SerializeToString,
+            server__service__pb2.ReadResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -143,8 +143,8 @@ class ServerService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/ServerService/delete',
-            primaryBlocking_dot_server__service__pb2.FileRequest.SerializeToString,
-            primaryBlocking_dot_status__pb2.Status.FromString,
+            server__service__pb2.FileRequest.SerializeToString,
+            status__pb2.Status.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -160,7 +160,7 @@ class ServerService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/ServerService/SendReplicaInfoToPrimary',
-            primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryRequest.SerializeToString,
-            primaryBlocking_dot_server__service__pb2.SendReplicaInfoToPrimaryResponse.FromString,
+            server__service__pb2.SendReplicaInfoToPrimaryRequest.SerializeToString,
+            server__service__pb2.SendReplicaInfoToPrimaryResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
