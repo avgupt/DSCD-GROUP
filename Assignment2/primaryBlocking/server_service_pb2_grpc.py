@@ -2,8 +2,8 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import server_service_pb2 as primaryBlocking_dot_server__service__pb2
-import status_pb2 as primaryBlocking_dot_status__pb2
+from primaryBlocking import server_service_pb2 as primaryBlocking_dot_server__service__pb2
+from primaryBlocking import status_pb2 as primaryBlocking_dot_status__pb2
 
 
 class ServerServiceStub(object):
@@ -15,8 +15,13 @@ class ServerServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.write = channel.unary_unary(
-                '/ServerService/write',
+        self.WriteFromClient = channel.unary_unary(
+                '/ServerService/WriteFromClient',
+                request_serializer=primaryBlocking_dot_server__service__pb2.WriteRequest.SerializeToString,
+                response_deserializer=primaryBlocking_dot_server__service__pb2.WriteResponse.FromString,
+                )
+        self.WriteFromPrimary = channel.unary_unary(
+                '/ServerService/WriteFromPrimary',
                 request_serializer=primaryBlocking_dot_server__service__pb2.WriteRequest.SerializeToString,
                 response_deserializer=primaryBlocking_dot_server__service__pb2.WriteResponse.FromString,
                 )
@@ -40,7 +45,13 @@ class ServerServiceStub(object):
 class ServerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def write(self, request, context):
+    def WriteFromClient(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def WriteFromPrimary(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -67,8 +78,13 @@ class ServerServiceServicer(object):
 
 def add_ServerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'write': grpc.unary_unary_rpc_method_handler(
-                    servicer.write,
+            'WriteFromClient': grpc.unary_unary_rpc_method_handler(
+                    servicer.WriteFromClient,
+                    request_deserializer=primaryBlocking_dot_server__service__pb2.WriteRequest.FromString,
+                    response_serializer=primaryBlocking_dot_server__service__pb2.WriteResponse.SerializeToString,
+            ),
+            'WriteFromPrimary': grpc.unary_unary_rpc_method_handler(
+                    servicer.WriteFromPrimary,
                     request_deserializer=primaryBlocking_dot_server__service__pb2.WriteRequest.FromString,
                     response_serializer=primaryBlocking_dot_server__service__pb2.WriteResponse.SerializeToString,
             ),
@@ -98,7 +114,7 @@ class ServerService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def write(request,
+    def WriteFromClient(request,
             target,
             options=(),
             channel_credentials=None,
@@ -108,7 +124,24 @@ class ServerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerService/write',
+        return grpc.experimental.unary_unary(request, target, '/ServerService/WriteFromClient',
+            primaryBlocking_dot_server__service__pb2.WriteRequest.SerializeToString,
+            primaryBlocking_dot_server__service__pb2.WriteResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def WriteFromPrimary(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ServerService/WriteFromPrimary',
             primaryBlocking_dot_server__service__pb2.WriteRequest.SerializeToString,
             primaryBlocking_dot_server__service__pb2.WriteResponse.FromString,
             options, channel_credentials,

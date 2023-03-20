@@ -4,7 +4,8 @@ import "primaryBlocking/status.proto";
 import "primaryBlocking/time_stamp.proto";
 
 service ServerService {
-    rpc write (WriteRequest) returns (WriteResponse) {};
+    rpc WriteFromClient (WriteRequest) returns (WriteResponse) {};
+    rpc WriteFromPrimary (WriteRequest) returns (WriteResponse) {};
     rpc read (FileRequest) returns (ReadResponse) {};
     rpc delete (FileRequest) returns (Status) {};
     rpc SendReplicaInfoToPrimary(SendReplicaInfoToPrimaryRequest) returns (SendReplicaInfoToPrimaryResponse) {};
