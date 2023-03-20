@@ -7,6 +7,9 @@ import registry_server_service_pb2 as registry_server_service_pb2
 import registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 from status_pb2 import Status
 from time_stamp_pb2 import Date, Time, TimeStamp
+from pathlib import Path
+import datetime
+
 
 class ServerServicer(server_pb2_grpc.ServerServiceServicer):
     def __init__(self, is_primary_replica, primary_replica_ip, primary_replica_port,replica_name):
@@ -15,7 +18,9 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
         self.primary_replica_port = primary_replica_port
         self.replicas = [] # primary replica not added
         self.key_value_pairs = {}
-        self.path = "/home/dscd-a2/"+replica_name
+        self.path = "folders\\" + replica_name
+        Path(self.path).mkdir(parents=True, exist_ok=True)
+        
 
     def SendReplicaInfoToPrimary(self, request, context):
         # TODO(shelly): add case for failure
@@ -26,39 +31,49 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
         self.replicas.append(address)
         return server_pb2.SendReplicaInfoToPrimaryResponse(status=server_pb2.SendReplicaInfoToPrimaryResponse.Status.SUCCESS)
 
-    def WriteFromPrimary(self, request, context):
-        self.key_value_pairs[request.uuid] = (request.file_name, request.file_content)
-        # TODO(manvi): Make the file in the address and write the content and make file_version
-        file_version = ""
-        return server_pb2.WriteResponse(uuid = request.uuid, version = file_version, status = Status.SUCCESS)
-
-    
-    def WriteFromClient(self, request, context):
-        if self.is_primary_replica:
-
-            # Case 1: uuid does not exist
-            self.key_value_pairs[request.uuid] = (request.file_name, request.file_content)
-            # TODO(manvi): Make the file in the address and write the content and make file_version
-            file_version = ""
-            for i in self.replicas:
-                with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
-                    stub = server_pb2_grpc.ServerServiceStub(channel)       
-                    response = stub.WriteFromPrimary(server_pb2.WriteRequest(file_name=request.file_name, file_content=request.file_content, uuid=request.uuid))
-                    if response.status != registry_server_service_pb2.Status.SUCCESS:
-                        return server_pb2.WriteResponse(uuid = request.uuid, version = file_version, status = Status.FAILURE)
-            
-            return server_pb2.WriteResponse(uuid = request.uuid, version = file_version, status = Status.SUCCESS)
+    def writeInFile(self, file_name, file_content):
+        with open(self.path + "\\" + file_name, "w") as file:
+            file.write(file_content)
         
+        x = datetime.datetime.now()
+        d = Date(day=11, month=12, year=2023)
+        t = Time(hour=11, minute=51, second=11)
+        file_version = TimeStamp(date=d, time=t)
+        return file_version
+    
+    def write(self, request, context):
+        # TODO(manvi): Add other write cases
+        if request.is_write_from_client == 1:
+            if self.is_primary_replica:
+
+                # Case 1: uuid does not exist
+                self.key_value_pairs[request.uuid] = (request.file_name, request.file_content)
+                file_version = self.writeInFile(request.file_name, request.file_content)
+
+                for i in self.replicas:
+                    with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
+                        stub = server_pb2_grpc.ServerServiceStub(channel)       
+                        response = stub.write(server_pb2.WriteRequest(file_name=request.file_name, file_content=request.file_content, uuid=request.uuid, is_write_from_client=0))
+
+                        if response.status.type != Status.STATUS_TYPE.SUCCESS:
+                            return server_pb2.WriteResponse(uuid=request.uuid, version=file_version, status=Status(type=Status.STATUS_TYPE.FAILURE))
+                
+                return server_pb2.WriteResponse(uuid=request.uuid, version=file_version, status=Status(type=Status.STATUS_TYPE.SUCCESS))
+            
+            else:
+                with grpc.insecure_channel(str(self.primary_replica_ip)+ ":" +str(self.primary_replica_port), options=(('grpc.enable_http_proxy', 0),)) as channel:
+                    stub = server_pb2_grpc.ServerServiceStub(channel)       
+                    response = stub.write(server_pb2.WriteRequest(file_name=request.file_name, file_content=request.file_content, uuid=request.uuid, is_write_from_client=1))
+
+                    if response.status.type != Status.STATUS_TYPE.SUCCESS:
+                        return server_pb2.WriteResponse(uuid=request.uuid, version=response.version, status=Status(type=Status.STATUS_TYPE.FAILURE))
+                    else:
+                        return server_pb2.WriteResponse(uuid=request.uuid, version=response.version, status=Status(type=Status.STATUS_TYPE.SUCCESS))
+
         else:
-            with grpc.insecure_channel(self.primary_replica_ip+ ":" +self.primary_replica_port, options=(('grpc.enable_http_proxy', 0),)) as channel:
-                stub = server_pb2_grpc.ServerServiceStub(channel)       
-                response = stub.WriteFromClient(server_pb2.WriteRequest(file_name=request.file_name, file_content=request.file_content, uuid=request.uuid))
-
-                if response.Status != Status.SUCCESS:
-                    return server_pb2.WriteResponse(uuid = request.uuid, version = file_version, status = Status.FAILURE)
-                else:
-                    return server_pb2.WriteResponse(uuid = request.uuid, version = file_version, status = Status.SUCCESS)
-
+            self.key_value_pairs[request.uuid] = (request.file_name, request.file_content)
+            file_version = self.writeInFile(request.file_name, request.file_content)
+            return server_pb2.WriteResponse(uuid=request.uuid, version=file_version, status=Status(type=Status.STATUS_TYPE.SUCCESS))
 
 class Server:
 
