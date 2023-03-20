@@ -30,13 +30,15 @@ class RegisterService(registry_server_service_pb2_grpc.RegistryServerServiceServ
             self.primary_replica_ip = ip
             self.primary_replica_port = port
 
+        replica_name = 'replica_' + str(len(self.servers))
+
         if is_primary_replica is False:
             primary_replica_address = self.primary_replica_ip + ':' + str(self.primary_replica_port)
             self.sendReplicaInfoToPrimaryReplica(ip,port,primary_replica_address)
         
         self.servers.append(address)
         print("Replica registered to RegistryServer, replica address:",address)
-        return registry_server_service_pb2.RegisterReplicaResponse(is_replica_primary = is_primary_replica, primary_replica_ip = self.primary_replica_ip, primary_replica_port = self.primary_replica_port,status=registry_server_service_pb2.RegisterReplicaResponse.SUCCESS)
+        return registry_server_service_pb2.RegisterReplicaResponse(is_replica_primary = is_primary_replica, primary_replica_ip = self.primary_replica_ip, primary_replica_port = self.primary_replica_port,replica_name=replica_name,status=registry_server_service_pb2.RegisterReplicaResponse.SUCCESS)
     
     def sendReplicaInfoToPrimaryReplica(self,ip,port,primary_replica_address):
         with grpc.insecure_channel(primary_replica_address , options=(('grpc.enable_http_proxy', 0),)) as channel:

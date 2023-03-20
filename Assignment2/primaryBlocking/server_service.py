@@ -9,14 +9,13 @@ from status_pb2 import Status
 from time_stamp_pb2 import Date, Time, TimeStamp
 
 class ServerServicer(server_pb2_grpc.ServerServiceServicer):
-    def __init__(self, is_primary_replica, primary_replica_ip, primary_replica_port):
+    def __init__(self, is_primary_replica, primary_replica_ip, primary_replica_port,replica_name):
         self.is_primary_replica = is_primary_replica
         self.primary_replica_ip = primary_replica_ip
         self.primary_replica_port = primary_replica_port
         self.replicas = [] # primary replica not added
         self.key_value_pairs = {}
-        self.path = "/home/dscd-a2/"
-
+        self.path = "/home/dscd-a2/"+replica_name
 
     def SendReplicaInfoToPrimary(self, request, context):
         # TODO(shelly): add case for failure
@@ -69,7 +68,7 @@ class Server:
 
     def start(self):
         response = self.__register()
-        self.__serve(response.is_replica_primary, response.primary_replica_ip, response.primary_replica_port)
+        self.__serve(response.is_replica_primary, response.primary_replica_ip, response.primary_replica_port, response.replica_name)
 
     def __register(self)->bool:
         print("Will try to register to registry server ...")
@@ -77,14 +76,15 @@ class Server:
             stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
             
             response = stub.RegisterReplica(registry_server_service_pb2.RegisterReplicaRequest(ip=self.address,port=int(self.port))) 
+            print(response.replica_name)
             print("Is primary",response.is_replica_primary)
             return response
     
-    def __serve(self, is_replica_primary, primary_replica_ip, primary_replica_port):
+    def __serve(self, is_replica_primary, primary_replica_ip, primary_replica_port,replica_name):
 
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         server_pb2_grpc.add_ServerServiceServicer_to_server(
-            ServerServicer(is_replica_primary, primary_replica_ip=primary_replica_ip,primary_replica_port=primary_replica_port), server
+            ServerServicer(is_replica_primary, primary_replica_ip=primary_replica_ip,primary_replica_port=primary_replica_port,replica_name=replica_name), server
         )
         server.add_insecure_port("[::]:" + self.port)
         server.start()

@@ -2,8 +2,8 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from primaryBlocking import server_service_pb2 as primaryBlocking_dot_server__service__pb2
-from primaryBlocking import status_pb2 as primaryBlocking_dot_status__pb2
+import server_service_pb2 as primaryBlocking_dot_server__service__pb2
+import status_pb2 as primaryBlocking_dot_status__pb2
 
 
 class ServerServiceStub(object):
