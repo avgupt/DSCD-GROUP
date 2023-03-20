@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cstatus.proto\"T\n\x06Status\x12!\n\x04type\x18\x01 \x01(\x0e\x32\x13.Status.STATUS_TYPE\"\'\n\x0bSTATUS_TYPE\x12\x0b\n\x07SUCCESS\x10\x00\x12\x0b\n\x07\x46\x41ILURE\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cstatus.proto\"e\n\x06Status\x12!\n\x04type\x18\x01 \x01(\x0e\x32\x13.Status.STATUS_TYPE\x12\x0f\n\x07message\x18\x02 \x01(\t\"\'\n\x0bSTATUS_TYPE\x12\x0b\n\x07SUCCESS\x10\x00\x12\x0b\n\x07\x46\x41ILURE\x10\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'status_pb2', globals())
@@ -21,7 +21,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _STATUS._serialized_start=16
-  _STATUS._serialized_end=100
-  _STATUS_STATUS_TYPE._serialized_start=61
-  _STATUS_STATUS_TYPE._serialized_end=100
+  _STATUS._serialized_end=117
+  _STATUS_STATUS_TYPE._serialized_start=78
+  _STATUS_STATUS_TYPE._serialized_end=117
 # @@protoc_insertion_point(module_scope)

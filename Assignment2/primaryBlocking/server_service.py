@@ -20,7 +20,12 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
         self.key_value_pairs = {}
         self.path = "folders\\" + replica_name
         Path(self.path).mkdir(parents=True, exist_ok=True)
-        
+
+    def filenameInPairs(self, file_name):
+        for key, item in self.key_value_pairs.items():
+            if (item[0] == file_name):
+                return True
+        return False
 
     def SendReplicaInfoToPrimary(self, request, context):
         # TODO(shelly): add case for failure
@@ -36,39 +41,53 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
             file.write(file_content)
         
         x = datetime.datetime.now()
-        d = Date(day=11, month=12, year=2023)
-        t = Time(hour=11, minute=51, second=11)
-        file_version = TimeStamp(date=d, time=t)
+        file_version = TimeStamp(date=Date(day=x.day, month=x.month, year=x.year), time=Time(hour=x.hour, minute=x.minute, second=x.second))
+        
         return file_version
     
     def write(self, request, context):
-        # TODO(manvi): Add other write cases
         if request.is_write_from_client == 1:
-            if self.is_primary_replica:
-
-                # Case 1: uuid does not exist
-                self.key_value_pairs[request.uuid] = (request.file_name, request.file_content)
-                file_version = self.writeInFile(request.file_name, request.file_content)
-
-                for i in self.replicas:
-                    with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
-                        stub = server_pb2_grpc.ServerServiceStub(channel)       
-                        response = stub.write(server_pb2.WriteRequest(file_name=request.file_name, file_content=request.file_content, uuid=request.uuid, is_write_from_client=0))
-
-                        if response.status.type != Status.STATUS_TYPE.SUCCESS:
-                            return server_pb2.WriteResponse(uuid=request.uuid, version=file_version, status=Status(type=Status.STATUS_TYPE.FAILURE))
-                
-                return server_pb2.WriteResponse(uuid=request.uuid, version=file_version, status=Status(type=Status.STATUS_TYPE.SUCCESS))
             
+            if self.is_primary_replica:
+                
+                if (request.uuid not in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)) or (request.uuid in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name)):
+                    # Case 1: uuid and name does not exist
+                    # Case 3: uuid and name exists
+                    self.key_value_pairs[request.uuid] = (request.file_name, request.file_content)
+                    file_version = self.writeInFile(request.file_name, request.file_content)
+
+                    for i in self.replicas:
+                        with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
+                            stub = server_pb2_grpc.ServerServiceStub(channel)       
+                            response = stub.write(server_pb2.WriteRequest(file_name=request.file_name, file_content=request.file_content, uuid=request.uuid, is_write_from_client=0))
+
+                            if response.status.type != Status.STATUS_TYPE.SUCCESS:
+                                return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="FAILURE TO WRITE IN REPLICA"))
+                    
+                    return server_pb2.WriteResponse(uuid=request.uuid, version=file_version, status=Status(type=Status.STATUS_TYPE.SUCCESS))
+                
+                elif (request.uuid not in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name)):
+                    # Case 2: uuid does not exist and file name exists
+                    print("Cse 2")
+                    return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="FILE WITH THE SAME NAME ALREADY EXISTS"))
+                
+                elif (request.uuid in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)):
+                    # Case 4: uuid exists and file name does not exist
+                    print("case 4")
+                    return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="DELETED FILE CANNOT BE UPDATED"))
+                else:
+                    # Case else
+                    return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="INVALID REQUEST"))
+                
             else:
                 with grpc.insecure_channel(str(self.primary_replica_ip)+ ":" +str(self.primary_replica_port), options=(('grpc.enable_http_proxy', 0),)) as channel:
                     stub = server_pb2_grpc.ServerServiceStub(channel)       
                     response = stub.write(server_pb2.WriteRequest(file_name=request.file_name, file_content=request.file_content, uuid=request.uuid, is_write_from_client=1))
 
                     if response.status.type != Status.STATUS_TYPE.SUCCESS:
-                        return server_pb2.WriteResponse(uuid=request.uuid, version=response.version, status=Status(type=Status.STATUS_TYPE.FAILURE))
+                        return server_pb2.WriteResponse(uuid=request.uuid, status=response.status)
                     else:
-                        return server_pb2.WriteResponse(uuid=request.uuid, version=response.version, status=Status(type=Status.STATUS_TYPE.SUCCESS))
+                        return server_pb2.WriteResponse(uuid=request.uuid, version=response.version, status=response.status)
 
         else:
             self.key_value_pairs[request.uuid] = (request.file_name, request.file_content)

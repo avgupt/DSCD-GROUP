@@ -39,6 +39,7 @@ class Client:
             
             else:
                 print("Status : FAILURE")
+                print("Reason :", response.status.message)
         
 
 if __name__== "__main__":
