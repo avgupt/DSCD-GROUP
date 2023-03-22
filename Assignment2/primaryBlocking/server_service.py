@@ -9,6 +9,8 @@ from status_pb2 import Status
 from time_stamp_pb2 import Date, Time, TimeStamp
 from pathlib import Path
 import datetime
+import os
+
 
 
 class ServerServicer(server_pb2_grpc.ServerServiceServicer):
@@ -36,15 +38,67 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
         self.replicas.append(address)
         return server_pb2.SendReplicaInfoToPrimaryResponse(status=server_pb2.SendReplicaInfoToPrimaryResponse.Status.SUCCESS)
 
+    def getFileVersion(self):
+        x = datetime.datetime.now()
+        file_version = TimeStamp(date=Date(day=x.day, month=x.month, year=x.year), time=Time(hour=x.hour, minute=x.minute, second=x.second))
+        return file_version
+
     def writeInFile(self, file_name, file_content):
         with open(self.path + "\\" + file_name, "w") as file:
             file.write(file_content)
-        
-        x = datetime.datetime.now()
-        file_version = TimeStamp(date=Date(day=x.day, month=x.month, year=x.year), time=Time(hour=x.hour, minute=x.minute, second=x.second))
-        
+        file_version = self.getFileVersion()
         return file_version
     
+    def deleteFile(self, file_uuid):
+        file_name = self.key_value_pairs[file_uuid][0]
+        print(file_name)
+        file_path = self.path + "\\" + file_name
+        if os.path.isfile(file_path):       
+            os.remove(file_path)
+        file_version = self.getFileVersion()
+        return file_version
+
+    def delete(self, request, context):
+        if request.is_delete_from_client == 1:
+            if self.is_primary_replica:
+                # Case 1:uuid does not exist
+                if request.uuid not in self.key_value_pairs.keys():
+                    return Status(type=Status.STATUS_TYPE.FAILURE, message="FILE DOES NOT EXIST")
+                
+                # Case 2: uuid and file name exists.
+                elif request.uuid in self.key_value_pairs.keys() and self.key_value_pairs[request.uuid][0] != "":
+                    file_version = self.deleteFile(request.uuid)
+                    self.key_value_pairs[request.uuid] = ("", file_version)
+                    
+                    for i in self.replicas:
+                        with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
+                            stub = server_pb2_grpc.ServerServiceStub(channel)       
+                            response = stub.delete(server_pb2.FileRequest(uuid=request.uuid, is_delete_from_client=0))
+
+                            if response.type != Status.STATUS_TYPE.SUCCESS:
+                                return Status(type=Status.STATUS_TYPE.FAILURE, message="FAILURE TO DELETE FROM REPLICA")
+                    
+                    return Status(type=Status.STATUS_TYPE.SUCCESS)
+                
+                # Case 3: uuid exists and file name does not exist.
+                elif request.uuid in self.key_value_pairs.keys() and self.key_value_pairs[request.uuid][0] == "":
+                    return Status(type=Status.STATUS_TYPE.FAILURE, message="FILE ALREADY DELETED")
+                else:
+                    return Status(type=Status.STATUS_TYPE.FAILURE, message="INVALID CASE")
+                
+            else:
+                with grpc.insecure_channel(str(self.primary_replica_ip)+ ":" +str(self.primary_replica_port), options=(('grpc.enable_http_proxy', 0),)) as channel:
+                    stub = server_pb2_grpc.ServerServiceStub(channel)       
+                    response = stub.delete(server_pb2.FileRequest(uuid=request.uuid, is_delete_from_client=1))
+                    return response
+                
+        else:
+            file_version = self.deleteFile(request.uuid)
+            self.key_value_pairs[request.uuid] = (request.uuid, file_version)
+            return Status(type=Status.STATUS_TYPE.SUCCESS)
+            
+
+
     def write(self, request, context):
         if request.is_write_from_client == 1:
             
@@ -53,8 +107,8 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
                 if (request.uuid not in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)) or (request.uuid in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name)):
                     # Case 1: uuid and name does not exist
                     # Case 3: uuid and name exists
-                    self.key_value_pairs[request.uuid] = (request.file_name, request.file_content)
                     file_version = self.writeInFile(request.file_name, request.file_content)
+                    self.key_value_pairs[request.uuid] = (request.file_name, file_version)
 
                     for i in self.replicas:
                         with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
@@ -68,12 +122,12 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
                 
                 elif (request.uuid not in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name)):
                     # Case 2: uuid does not exist and file name exists
-                    print("Cse 2")
+                    # print("Cse 2")
                     return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="FILE WITH THE SAME NAME ALREADY EXISTS"))
                 
                 elif (request.uuid in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)):
                     # Case 4: uuid exists and file name does not exist
-                    print("case 4")
+                    # print("case 4")
                     return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="DELETED FILE CANNOT BE UPDATED"))
                 else:
                     # Case else
@@ -90,11 +144,11 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
                         return server_pb2.WriteResponse(uuid=request.uuid, version=response.version, status=response.status)
 
         else:
-            self.key_value_pairs[request.uuid] = (request.file_name, request.file_content)
             file_version = self.writeInFile(request.file_name, request.file_content)
+            self.key_value_pairs[request.uuid] = (request.file_name, file_version)
             return server_pb2.WriteResponse(uuid=request.uuid, version=file_version, status=Status(type=Status.STATUS_TYPE.SUCCESS))
 
-class Server:
+class Server: 
 
     def __init__(self, port):
         self.address = "localhost"

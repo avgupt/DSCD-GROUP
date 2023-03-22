@@ -38,6 +38,7 @@ message WriteResponse {
 
 message FileRequest {
     string uuid = 1;
+    int32 is_delete_from_client = 2;
 }
 
 message ReadResponse {
