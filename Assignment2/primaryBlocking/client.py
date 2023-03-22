@@ -90,4 +90,9 @@ if __name__== "__main__":
                 # file_uuid = str(uuid.uuid1()) #Trial for Case 1: delete
                 myClient.delete(file_uuid, server_name)
 
-    
+            else:
+                file_uuid_no = int(input("Enter file number (in order of file written): "))
+                file_uuid = file_dict[file_uuid_no]
+                file_name = input("Enter the same file name ([name].txt): ")
+                file_content = input("Enter file content: ")
+                myClient.write(file_name, file_content, file_uuid, server_name)
