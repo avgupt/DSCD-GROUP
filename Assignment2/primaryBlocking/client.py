@@ -29,7 +29,7 @@ class Client:
         return version_in_str
 
     def write(self, file_name, file_content, uuid, server_path):
-        with grpc.insecure_channel('localhost:8081', options=(('grpc.enable_http_proxy', 0),)) as channel:
+        with grpc.insecure_channel(server_path, options=(('grpc.enable_http_proxy', 0),)) as channel:
             stub = server_pb2_grpc.ServerServiceStub(channel)
             response = stub.write(server_pb2.WriteRequest(file_name=file_name, file_content=file_content, uuid=uuid, is_write_from_client=1))
             if response.status.type == Status.STATUS_TYPE.SUCCESS:
@@ -40,6 +40,16 @@ class Client:
             else:
                 print("Status : FAILURE")
                 print("Reason :", response.status.message)
+
+    def delete(self, uuid, server_path):
+        with grpc.insecure_channel(server_path, options=(('grpc.enable_http_proxy', 0),)) as channel:
+            stub = server_pb2_grpc.ServerServiceStub(channel)
+            response = stub.delete(server_pb2.FileRequest(uuid=uuid, is_delete_from_client=1))
+            if response.type == Status.STATUS_TYPE.SUCCESS:
+                print("Status : SUCCESS")
+            else:
+                print("Status : FAILURE")
+                print("Reason :", response.message)
         
 
 if __name__== "__main__":
@@ -75,8 +85,9 @@ if __name__== "__main__":
                 # myClient.read(file_uuid, server_name)
 
             elif n == 4: 
-                file_uuid_no = input("Enter file number: ")
+                file_uuid_no = int(input("Enter file number (in order of file written): "))
                 file_uuid = file_dict[file_uuid_no]
-                # myClient.delete(file_uuid, server_name)
+                # file_uuid = str(uuid.uuid1()) #Trial for Case 1: delete
+                myClient.delete(file_uuid, server_name)
 
     
