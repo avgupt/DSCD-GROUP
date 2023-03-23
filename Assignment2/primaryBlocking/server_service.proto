@@ -6,7 +6,7 @@ import "time_stamp.proto";
 service ServerService {
     rpc write (WriteRequest) returns (WriteResponse) {};
     rpc read (ReadRequest) returns (ReadResponse) {};
-    rpc delete (FileRequest) returns (Status) {};
+    rpc delete (DeleteRequest) returns (Status) {};
     rpc SendReplicaInfoToPrimary(SendReplicaInfoToPrimaryRequest) returns (SendReplicaInfoToPrimaryResponse) {};
 }
 
@@ -36,8 +36,7 @@ message WriteResponse {
     Status status = 3;
 }
 
-// TODO: rename to delete request
-message FileRequest {
+message DeleteRequest {
     string uuid = 1;
     int32 is_delete_from_client = 2;
 }
