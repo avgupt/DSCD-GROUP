@@ -15,7 +15,7 @@ import status_pb2 as status__pb2
 import time_stamp_pb2 as time__stamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14server_service.proto\x1a\x0cstatus.proto\x1a\x10time_stamp.proto\";\n\x1fSendReplicaInfoToPrimaryRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"\x7f\n SendReplicaInfoToPrimaryResponse\x12\x38\n\x06status\x18\x01 \x01(\x0e\x32(.SendReplicaInfoToPrimaryResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\"c\n\x0cWriteRequest\x12\x11\n\tfile_name\x18\x01 \x01(\t\x12\x14\n\x0c\x66ile_content\x18\x02 \x01(\t\x12\x0c\n\x04uuid\x18\x03 \x01(\t\x12\x1c\n\x14is_write_from_client\x18\x04 \x01(\x05\"S\n\rWriteResponse\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x1b\n\x07version\x18\x02 \x01(\x0b\x32\n.TimeStamp\x12\x17\n\x06status\x18\x03 \x01(\x0b\x32\x07.Status\":\n\x0b\x46ileRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x1d\n\x15is_delete_from_client\x18\x02 \x01(\x05\"h\n\x0cReadResponse\x12\x11\n\tfile_name\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12\x1b\n\x07version\x18\x04 \x01(\x0b\x32\n.TimeStamp\x12\x17\n\x06status\x18\x01 \x01(\x0b\x32\x07.Status2\xe6\x01\n\rServerService\x12(\n\x05write\x12\r.WriteRequest\x1a\x0e.WriteResponse\"\x00\x12%\n\x04read\x12\x0c.FileRequest\x1a\r.ReadResponse\"\x00\x12!\n\x06\x64\x65lete\x12\x0c.FileRequest\x1a\x07.Status\"\x00\x12\x61\n\x18SendReplicaInfoToPrimary\x12 .SendReplicaInfoToPrimaryRequest\x1a!.SendReplicaInfoToPrimaryResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14server_service.proto\x1a\x0cstatus.proto\x1a\x10time_stamp.proto\";\n\x1fSendReplicaInfoToPrimaryRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"\x7f\n SendReplicaInfoToPrimaryResponse\x12\x38\n\x06status\x18\x01 \x01(\x0e\x32(.SendReplicaInfoToPrimaryResponse.Status\"!\n\x06Status\x12\n\n\x06\x46\x41ILED\x10\x00\x12\x0b\n\x07SUCCESS\x10\x01\"c\n\x0cWriteRequest\x12\x11\n\tfile_name\x18\x01 \x01(\t\x12\x14\n\x0c\x66ile_content\x18\x02 \x01(\t\x12\x0c\n\x04uuid\x18\x03 \x01(\t\x12\x1c\n\x14is_write_from_client\x18\x04 \x01(\x05\"S\n\rWriteResponse\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x1b\n\x07version\x18\x02 \x01(\x0b\x32\n.TimeStamp\x12\x17\n\x06status\x18\x03 \x01(\x0b\x32\x07.Status\":\n\x0b\x46ileRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x1d\n\x15is_delete_from_client\x18\x02 \x01(\x05\"\x1b\n\x0bReadRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t\"h\n\x0cReadResponse\x12\x11\n\tfile_name\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12\x1b\n\x07version\x18\x04 \x01(\x0b\x32\n.TimeStamp\x12\x17\n\x06status\x18\x01 \x01(\x0b\x32\x07.Status2\xe6\x01\n\rServerService\x12(\n\x05write\x12\r.WriteRequest\x1a\x0e.WriteResponse\"\x00\x12%\n\x04read\x12\x0c.ReadRequest\x1a\r.ReadResponse\"\x00\x12!\n\x06\x64\x65lete\x12\x0c.FileRequest\x1a\x07.Status\"\x00\x12\x61\n\x18SendReplicaInfoToPrimary\x12 .SendReplicaInfoToPrimaryRequest\x1a!.SendReplicaInfoToPrimaryResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'server_service_pb2', globals())
@@ -34,8 +34,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _WRITERESPONSE._serialized_end=430
   _FILEREQUEST._serialized_start=432
   _FILEREQUEST._serialized_end=490
-  _READRESPONSE._serialized_start=492
-  _READRESPONSE._serialized_end=596
-  _SERVERSERVICE._serialized_start=599
-  _SERVERSERVICE._serialized_end=829
+  _READREQUEST._serialized_start=492
+  _READREQUEST._serialized_end=519
+  _READRESPONSE._serialized_start=521
+  _READRESPONSE._serialized_end=625
+  _SERVERSERVICE._serialized_start=628
+  _SERVERSERVICE._serialized_end=858
 # @@protoc_insertion_point(module_scope)

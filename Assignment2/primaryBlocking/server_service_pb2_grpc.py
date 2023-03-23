@@ -22,7 +22,7 @@ class ServerServiceStub(object):
                 )
         self.read = channel.unary_unary(
                 '/ServerService/read',
-                request_serializer=server__service__pb2.FileRequest.SerializeToString,
+                request_serializer=server__service__pb2.ReadRequest.SerializeToString,
                 response_deserializer=server__service__pb2.ReadResponse.FromString,
                 )
         self.delete = channel.unary_unary(
@@ -74,7 +74,7 @@ def add_ServerServiceServicer_to_server(servicer, server):
             ),
             'read': grpc.unary_unary_rpc_method_handler(
                     servicer.read,
-                    request_deserializer=server__service__pb2.FileRequest.FromString,
+                    request_deserializer=server__service__pb2.ReadRequest.FromString,
                     response_serializer=server__service__pb2.ReadResponse.SerializeToString,
             ),
             'delete': grpc.unary_unary_rpc_method_handler(
@@ -126,7 +126,7 @@ class ServerService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/ServerService/read',
-            server__service__pb2.FileRequest.SerializeToString,
+            server__service__pb2.ReadRequest.SerializeToString,
             server__service__pb2.ReadResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

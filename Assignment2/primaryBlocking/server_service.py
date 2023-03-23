@@ -57,6 +57,11 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
             os.remove(file_path)
         file_version = self.getFileVersion()
         return file_version
+    
+    def readFromFile(self, file_name):
+        with open(self.path + "\\" + file_name, "r") as file:
+            file_content = file.read()
+        return file_content
 
     def delete(self, request, context):
         if request.is_delete_from_client == 1:
@@ -94,7 +99,7 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
                 
         else:
             file_version = self.deleteFile(request.uuid)
-            self.key_value_pairs[request.uuid] = (request.uuid, file_version)
+            self.key_value_pairs[request.uuid] = (request.uuid, file_version) # Doubt: should not be empty string here for file name?
             return Status(type=Status.STATUS_TYPE.SUCCESS)
             
 
@@ -147,6 +152,26 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
             file_version = self.writeInFile(request.file_name, request.file_content)
             self.key_value_pairs[request.uuid] = (request.file_name, file_version)
             return server_pb2.WriteResponse(uuid=request.uuid, version=file_version, status=Status(type=Status.STATUS_TYPE.SUCCESS))
+        
+    def read(self, request, context):
+        # case 1: uuid does not exist
+        if request.uuid not in self.key_value_pairs.keys():
+            return server_pb2.ReadResponse(file_name=None, content=None, version=None, status=Status(type=Status.STATUS_TYPE.FAILURE, message="FILE DOES NOT EXIST"))
+        
+        # Case 2: uuid and file name exists.
+        elif request.uuid in self.key_value_pairs.keys() and self.key_value_pairs[request.uuid][0] != "":
+            file_name = self.key_value_pairs[request.uuid][0]
+            file_version = self.key_value_pairs[request.uuid][1]
+            file_content = self.readFromFile(file_name=file_name)
+            return server_pb2.ReadResponse(file_name=file_name, content=file_content, version=file_version, status=Status(type=Status.STATUS_TYPE.SUCCESS, message="SUCCESS"))
+        
+        # Case 3: uuid exists and file name does not exist.
+        elif request.uuid in self.key_value_pairs.keys() and self.key_value_pairs[request.uuid][0] == "":
+            return server_pb2.ReadResponse(file_name=None, content=None, version=None, status=Status(type=Status.STATUS_TYPE.FAILURE, message="FILE ALREADY DELETED"))
+            
+        else:
+            return server_pb2.ReadResponse(file_name=None, content=None, version=None, status=Status(type=Status.STATUS_TYPE.FAILURE, message="INVALID CASE"))
+
 
 class Server: 
 

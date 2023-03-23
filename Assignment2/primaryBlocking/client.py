@@ -50,6 +50,19 @@ class Client:
             else:
                 print("Status : FAILURE")
                 print("Reason :", response.message)
+
+    def read(self, uuid, server_path):
+        with grpc.insecure_channel(server_path, options=(('grpc.enable_http_proxy', 0),)) as channel:
+            stub = server_pb2_grpc.ServerServiceStub(channel)
+            response = stub.read(server_pb2.ReadRequest(uuid=uuid))
+            if response.status.type == Status.STATUS_TYPE.SUCCESS:
+                print("Status : SUCCESS")
+                print("File name :", response.file_name)
+                print("Content :", response.content)
+                print("Version :", self.printVersion(response.version))
+            else:
+                print("Status : FAILURE")
+                print("Reason :", response.message)
         
 
 if __name__== "__main__":
@@ -80,9 +93,10 @@ if __name__== "__main__":
                 myClient.write(file_name, file_content, file_uuid, server_name)
 
             elif n == 3:
-                file_uuid_no = input("Enter file number: ")
-                file_uuid = file_dict[file_uuid_no]
-                # myClient.read(file_uuid, server_name)
+                # file_uuid_no = input("Enter file number: ")
+                # file_uuid = file_dict[file_uuid_no]
+                file_uuid = input("Enter file uuid: ")
+                myClient.read(file_uuid, server_name)
 
             elif n == 4: 
                 file_uuid_no = int(input("Enter file number (in order of file written): "))

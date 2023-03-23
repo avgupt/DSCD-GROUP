@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import registry_server_service_pb2 as primaryBlocking_dot_registry__server__service__pb2
+import registry_server_service_pb2 as registry__server__service__pb2
 
 
 class RegistryServerServiceStub(object):
@@ -16,13 +16,13 @@ class RegistryServerServiceStub(object):
         """
         self.RegisterReplica = channel.unary_unary(
                 '/RegistryServerService/RegisterReplica',
-                request_serializer=primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaRequest.SerializeToString,
-                response_deserializer=primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaResponse.FromString,
+                request_serializer=registry__server__service__pb2.RegisterReplicaRequest.SerializeToString,
+                response_deserializer=registry__server__service__pb2.RegisterReplicaResponse.FromString,
                 )
         self.GetReplicaList = channel.unary_unary(
                 '/RegistryServerService/GetReplicaList',
-                request_serializer=primaryBlocking_dot_registry__server__service__pb2.GetReplicaListRequest.SerializeToString,
-                response_deserializer=primaryBlocking_dot_registry__server__service__pb2.GetReplicaListResponse.FromString,
+                request_serializer=registry__server__service__pb2.GetReplicaListRequest.SerializeToString,
+                response_deserializer=registry__server__service__pb2.GetReplicaListResponse.FromString,
                 )
 
 
@@ -46,13 +46,13 @@ def add_RegistryServerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'RegisterReplica': grpc.unary_unary_rpc_method_handler(
                     servicer.RegisterReplica,
-                    request_deserializer=primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaRequest.FromString,
-                    response_serializer=primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaResponse.SerializeToString,
+                    request_deserializer=registry__server__service__pb2.RegisterReplicaRequest.FromString,
+                    response_serializer=registry__server__service__pb2.RegisterReplicaResponse.SerializeToString,
             ),
             'GetReplicaList': grpc.unary_unary_rpc_method_handler(
                     servicer.GetReplicaList,
-                    request_deserializer=primaryBlocking_dot_registry__server__service__pb2.GetReplicaListRequest.FromString,
-                    response_serializer=primaryBlocking_dot_registry__server__service__pb2.GetReplicaListResponse.SerializeToString,
+                    request_deserializer=registry__server__service__pb2.GetReplicaListRequest.FromString,
+                    response_serializer=registry__server__service__pb2.GetReplicaListResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -76,8 +76,8 @@ class RegistryServerService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/RegistryServerService/RegisterReplica',
-            primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaRequest.SerializeToString,
-            primaryBlocking_dot_registry__server__service__pb2.RegisterReplicaResponse.FromString,
+            registry__server__service__pb2.RegisterReplicaRequest.SerializeToString,
+            registry__server__service__pb2.RegisterReplicaResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -93,7 +93,7 @@ class RegistryServerService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/RegistryServerService/GetReplicaList',
-            primaryBlocking_dot_registry__server__service__pb2.GetReplicaListRequest.SerializeToString,
-            primaryBlocking_dot_registry__server__service__pb2.GetReplicaListResponse.FromString,
+            registry__server__service__pb2.GetReplicaListRequest.SerializeToString,
+            registry__server__service__pb2.GetReplicaListResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
