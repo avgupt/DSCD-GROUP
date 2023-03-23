@@ -44,7 +44,7 @@ class Client:
     def delete(self, uuid, server_path):
         with grpc.insecure_channel(server_path, options=(('grpc.enable_http_proxy', 0),)) as channel:
             stub = server_pb2_grpc.ServerServiceStub(channel)
-            response = stub.delete(server_pb2.FileRequest(uuid=uuid, is_delete_from_client=1))
+            response = stub.delete(server_pb2.DeleteRequest(uuid=uuid, is_delete_from_client=1))
             if response.type == Status.STATUS_TYPE.SUCCESS:
                 print("Status : SUCCESS")
             else:
@@ -62,7 +62,7 @@ class Client:
                 print("Version :", self.printVersion(response.version))
             else:
                 print("Status : FAILURE")
-                print("Reason :", response.message)
+                print("Reason :", response.status.message) #Doubt: Shouldn't this be response.status.message?
         
 
 if __name__== "__main__":
@@ -99,14 +99,16 @@ if __name__== "__main__":
                 myClient.read(file_uuid, server_name)
 
             elif n == 4: 
-                file_uuid_no = int(input("Enter file number (in order of file written): "))
-                file_uuid = file_dict[file_uuid_no]
+                file_uuid = input("Enter file uuid: ")
+                # file_uuid_no = int(input("Enter file number (in order of file written): "))
+                # file_uuid = file_dict[file_uuid_no]
                 # file_uuid = str(uuid.uuid1()) #Trial for Case 1: delete
                 myClient.delete(file_uuid, server_name)
 
             else:
-                file_uuid_no = int(input("Enter file number (in order of file written): "))
-                file_uuid = file_dict[file_uuid_no]
+                # file_uuid_no = int(input("Enter file number (in order of file written): "))
+                # file_uuid = file_dict[file_uuid_no]
+                file_uuid = input("Enter file uuid: ")
                 file_name = input("Enter the same file name ([name].txt): ")
                 file_content = input("Enter file content: ")
                 myClient.write(file_name, file_content, file_uuid, server_name)

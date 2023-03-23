@@ -78,7 +78,7 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
                     for i in self.replicas:
                         with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
                             stub = server_pb2_grpc.ServerServiceStub(channel)       
-                            response = stub.delete(server_pb2.FileRequest(uuid=request.uuid, is_delete_from_client=0))
+                            response = stub.delete(server_pb2.DeleteRequest(uuid=request.uuid, is_delete_from_client=0))
 
                             if response.type != Status.STATUS_TYPE.SUCCESS:
                                 return Status(type=Status.STATUS_TYPE.FAILURE, message="FAILURE TO DELETE FROM REPLICA")
@@ -94,12 +94,12 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
             else:
                 with grpc.insecure_channel(str(self.primary_replica_ip)+ ":" +str(self.primary_replica_port), options=(('grpc.enable_http_proxy', 0),)) as channel:
                     stub = server_pb2_grpc.ServerServiceStub(channel)       
-                    response = stub.delete(server_pb2.FileRequest(uuid=request.uuid, is_delete_from_client=1))
+                    response = stub.delete(server_pb2.DeleteRequest(uuid=request.uuid, is_delete_from_client=1))
                     return response
                 
         else:
             file_version = self.deleteFile(request.uuid)
-            self.key_value_pairs[request.uuid] = (request.uuid, file_version) # Doubt: should not be empty string here for file name?
+            self.key_value_pairs[request.uuid] = ("", file_version)
             return Status(type=Status.STATUS_TYPE.SUCCESS)
             
 
@@ -109,7 +109,7 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
             
             if self.is_primary_replica:
                 
-                if (request.uuid not in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)) or (request.uuid in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name)):
+                if (request.uuid not in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)) or (request.uuid in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name) and self.key_value_pairs[request.uuid] == request.file_name):
                     # Case 1: uuid and name does not exist
                     # Case 3: uuid and name exists
                     file_version = self.writeInFile(request.file_name, request.file_content)
@@ -134,9 +134,14 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
                     # Case 4: uuid exists and file name does not exist
                     # print("case 4")
                     return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="DELETED FILE CANNOT BE UPDATED"))
+                
+                elif (request.uuid in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name) and self.key_value_pairs[request.uuid] != request.file_name):
+                    # Case 5: uuid exists and name exists but do not match
+                    return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="FILE UUID AND FILE NAME DO NOT MATCH"))
+
                 else:
                     # Case else
-                    return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="INVALID REQUEST"))
+                    return server_pb2.WriteResponse(uuid=request.uuid, status=Status(type=Status.STATUS_TYPE.FAILURE, message="INVALID CASE"))
                 
             else:
                 with grpc.insecure_channel(str(self.primary_replica_ip)+ ":" +str(self.primary_replica_port), options=(('grpc.enable_http_proxy', 0),)) as channel:
