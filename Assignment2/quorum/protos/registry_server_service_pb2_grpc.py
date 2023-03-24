@@ -2,9 +2,9 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import registry_server_service_pb2 as registry__server__service__pb2
-import server_pb2 as server__pb2
-import status_pb2 as status__pb2
+from . import registry_server_service_pb2 as registry__server__service__pb2
+from . import server_pb2 as server__pb2
+from . import status_pb2 as status__pb2
 
 
 class RegistryServerServiceStub(object):

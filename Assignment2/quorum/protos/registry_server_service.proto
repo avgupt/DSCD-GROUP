@@ -12,10 +12,11 @@ message Request {
     enum REQUEST_TYPE {
         GET = 0;
         READ = 1;
-        DELETE = 2;
+        WRITE = 2;
+        DELETE = 3;
     }
 
-    REQUEST_TYPE type = 3;
+    REQUEST_TYPE type = 4;
 }
 
 message Response {

@@ -16,6 +16,7 @@ class Request(_message.Message):
     GET: Request.REQUEST_TYPE
     READ: Request.REQUEST_TYPE
     TYPE_FIELD_NUMBER: _ClassVar[int]
+    WRITE: Request.REQUEST_TYPE
     type: Request.REQUEST_TYPE
     def __init__(self, type: _Optional[_Union[Request.REQUEST_TYPE, str]] = ...) -> None: ...
 
