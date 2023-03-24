@@ -109,7 +109,7 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
             
             if self.is_primary_replica:
                 
-                if (request.uuid not in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)) or (request.uuid in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name) and self.key_value_pairs[request.uuid] == request.file_name):
+                if (request.uuid not in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)) or (request.uuid in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name) and self.key_value_pairs[request.uuid][0] == request.file_name):
                     # Case 1: uuid and name does not exist
                     # Case 3: uuid and name exists
                     file_version = self.writeInFile(request.file_name, request.file_content)

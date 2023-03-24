@@ -64,47 +64,52 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
             file_content = file.read()
         return file_content
 
-    def delete(self, request, context):
-        if request.is_delete_from_client == 1:
-            if self.is_primary_replica:
-                # Case 1:uuid does not exist
-                if request.uuid not in self.key_value_pairs.keys():
-                    return Status(type=Status.STATUS_TYPE.FAILURE, message="FILE DOES NOT EXIST")
+    def deleteFromClient(self, request, context):
+        if self.is_primary_replica:
+            # Case 1:uuid does not exist
+            if request.uuid not in self.key_value_pairs.keys():
+                yield Status(type=Status.STATUS_TYPE.FAILURE, message="FILE DOES NOT EXIST")
+            
+            # Case 2: uuid and file name exists.
+            elif request.uuid in self.key_value_pairs.keys() and self.key_value_pairs[request.uuid][0] != "":
+                file_version = self.deleteFile(request.uuid)
+                self.key_value_pairs[request.uuid] = ("", file_version)
                 
-                # Case 2: uuid and file name exists.
-                elif request.uuid in self.key_value_pairs.keys() and self.key_value_pairs[request.uuid][0] != "":
-                    file_version = self.deleteFile(request.uuid)
-                    self.key_value_pairs[request.uuid] = ("", file_version)
-                    
-                    for i in self.replicas:
-                        with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
-                            stub = server_pb2_grpc.ServerServiceStub(channel)       
-                            response = stub.delete(server_pb2.DeleteRequest(uuid=request.uuid, is_delete_from_client=0))
+                yield Status(type=Status.STATUS_TYPE.SUCCESS)
+                
+                print("Server done streaming responses")
+                time.sleep(15) # just to check first client get response the
+                
+                for i in self.replicas:
+                    with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
+                        stub = server_pb2_grpc.ServerServiceStub(channel)       
+                        response = stub.deleteFromPrimary(server_pb2.DeleteRequest(uuid=request.uuid))
 
-                            if response.type != Status.STATUS_TYPE.SUCCESS:
-                                return Status(type=Status.STATUS_TYPE.FAILURE, message="FAILURE TO DELETE FROM REPLICA")
-                    
-                    return Status(type=Status.STATUS_TYPE.SUCCESS)
+                        # if response.type != Status.STATUS_TYPE.SUCCESS:
+                            # yield Status(type=Status.STATUS_TYPE.FAILURE, message="FAILURE TO DELETE FROM REPLICA")
                 
-                # Case 3: uuid exists and file name does not exist.
-                elif request.uuid in self.key_value_pairs.keys() and self.key_value_pairs[request.uuid][0] == "":
-                    return Status(type=Status.STATUS_TYPE.FAILURE, message="FILE ALREADY DELETED")
-                else:
-                    return Status(type=Status.STATUS_TYPE.FAILURE, message="INVALID CASE")
                 
+            # Case 3: uuid exists and file name does not exist.
+            elif request.uuid in self.key_value_pairs.keys() and self.key_value_pairs[request.uuid][0] == "":
+                yield Status(type=Status.STATUS_TYPE.FAILURE, message="FILE ALREADY DELETED")
             else:
-                with grpc.insecure_channel(str(self.primary_replica_ip)+ ":" +str(self.primary_replica_port), options=(('grpc.enable_http_proxy', 0),)) as channel:
-                    stub = server_pb2_grpc.ServerServiceStub(channel)       
-                    response = stub.delete(server_pb2.DeleteRequest(uuid=request.uuid, is_delete_from_client=1))
-                    return response
-                
+                yield Status(type=Status.STATUS_TYPE.FAILURE, message="INVALID CASE")
+            
         else:
-            file_version = self.deleteFile(request.uuid)
-            self.key_value_pairs[request.uuid] = ("", file_version)
-            return Status(type=Status.STATUS_TYPE.SUCCESS)
+            with grpc.insecure_channel(str(self.primary_replica_ip)+ ":" +str(self.primary_replica_port), options=(('grpc.enable_http_proxy', 0),)) as channel:
+                stub = server_pb2_grpc.ServerServiceStub(channel)       
+                response_stream = stub.deleteFromClient(server_pb2.DeleteRequest(uuid=request.uuid))
+                response = next(response_stream)
+                response_stream.cancel()
+                yield response
+            
+    def deleteFromPrimary(self, request, context):
+        file_version = self.deleteFile(request.uuid)
+        self.key_value_pairs[request.uuid] = ("", file_version)
+        return Status(type=Status.STATUS_TYPE.SUCCESS)
             
     def writeFromPrimary(self, request, context):
-        print("write request from primary")
+        # print("write request from primary")
         file_version = self.writeInFile(request.file_name, request.file_content)
         self.key_value_pairs[request.uuid] = (request.file_name, file_version)
         return server_pb2.WriteResponse(uuid=request.uuid, version=file_version, status=Status(type=Status.STATUS_TYPE.SUCCESS))
@@ -114,7 +119,7 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
             
         if self.is_primary_replica:
             
-            if (request.uuid not in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)) or (request.uuid in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name) and self.key_value_pairs[request.uuid] == request.file_name):
+            if (request.uuid not in self.key_value_pairs.keys() and not self.filenameInPairs(request.file_name)) or (request.uuid in self.key_value_pairs.keys() and self.filenameInPairs(request.file_name) and self.key_value_pairs[request.uuid][0] == request.file_name):
                 # Case 1: uuid and name does not exist
                 # Case 3: uuid and name exists
                 file_version = self.writeInFile(request.file_name, request.file_content)
@@ -123,6 +128,7 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
                 yield response
                 print("Server done streaming responses")
                 time.sleep(15) # just to check first client get response the
+                
                 for i in self.replicas:
                         with grpc.insecure_channel(i, options=(('grpc.enable_http_proxy', 0),)) as channel:
                             stub = server_pb2_grpc.ServerServiceStub(channel)       
@@ -195,8 +201,8 @@ class Server:
             stub = registry_server_service_pb2_grpc.RegistryServerServiceStub(channel)
             
             response = stub.RegisterReplica(registry_server_service_pb2.RegisterReplicaRequest(ip=self.address,port=int(self.port))) 
-            print(response.replica_name)
-            print("Is primary",response.is_replica_primary)
+            # print(response.replica_name)
+            # print("Is primary",response.is_replica_primary)
             return response
     
     def __serve(self, is_replica_primary, primary_replica_ip, primary_replica_port,replica_name):

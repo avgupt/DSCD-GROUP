@@ -22,7 +22,7 @@ class RegisterService(registry_server_service_pb2_grpc.RegistryServerServiceServ
         is_primary_replica = False
 
         if address in self.servers:
-            print("Can't register, port already in use:",address)
+            print("Can't register, port already in use:", address)
             return registry_server_service_pb2.RegisterReplicaResponse(is_replica_primary = is_primary_replica, primary_replica_ip = self.primary_replica_ip, primary_replica_port = self.primary_replica_port,status=registry_server_service_pb2.RegisterReplicaResponse.FAILED)
 
         if len(self.servers) == 0:
