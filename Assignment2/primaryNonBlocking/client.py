@@ -46,12 +46,15 @@ class Client:
     def delete(self, uuid, server_path):
         with grpc.insecure_channel(server_path, options=(('grpc.enable_http_proxy', 0),)) as channel:
             stub = server_pb2_grpc.ServerServiceStub(channel)
-            response = stub.delete(server_pb2.DeleteRequest(uuid=uuid, is_delete_from_client=1))
+            response_stream = stub.deleteFromClient(server_pb2.DeleteRequest(uuid=uuid))
+            response = next(response_stream)
             if response.type == Status.STATUS_TYPE.SUCCESS:
                 print("Status : SUCCESS")
             else:
                 print("Status : FAILURE")
                 print("Reason :", response.message)
+            response_stream.cancel()
+
 
     def read(self, uuid, server_path):
         with grpc.insecure_channel(server_path, options=(('grpc.enable_http_proxy', 0),)) as channel:
