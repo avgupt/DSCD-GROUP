@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+import "status.proto";
+import "time_stamp.proto";
+
+service ServerService {
+    rpc writeFromClient (WriteRequest) returns (stream WriteResponse) {};
+    rpc writeFromPrimary (WriteRequest) returns (WriteResponse) {};
+    rpc read (ReadRequest) returns (ReadResponse) {};
+    rpc delete (DeleteRequest) returns (Status) {};
+    rpc SendReplicaInfoToPrimary(SendReplicaInfoToPrimaryRequest) returns (SendReplicaInfoToPrimaryResponse) {};
+}
+
+message SendReplicaInfoToPrimaryRequest{
+    string ip = 1;
+    int32 port = 2;
+}
+
+message SendReplicaInfoToPrimaryResponse{
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+    Status status = 1;
+}
+
+message WriteRequest {
+    string file_name = 1;
+    string file_content = 2;
+    string uuid = 3;
+}
+
+message WriteResponse {
+    string uuid = 1;
+    TimeStamp version = 2;
+    Status status = 3;
+}
+
+message DeleteRequest {
+    string uuid = 1;
+    int32 is_delete_from_client = 2;
+}
+
+message ReadRequest {
+    string uuid = 1;
+}
+
+message ReadResponse {
+    string file_name = 2;
+    string content = 3;
+    TimeStamp version = 4;
+    Status status = 1;
+}

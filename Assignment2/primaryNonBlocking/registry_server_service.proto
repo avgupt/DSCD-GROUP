@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+
+service RegistryServerService {
+    rpc RegisterReplica (RegisterReplicaRequest) returns (RegisterReplicaResponse) {}
+    rpc GetReplicaList (GetReplicaListRequest) returns (GetReplicaListResponse) {}
+  }
+
+message RegisterReplicaRequest {
+    string ip = 1;
+    int32 port = 2;
+  }
+
+message RegisterReplicaResponse {
+   enum Status {
+    FAILED = 0;
+    SUCCESS = 1;
+  }
+    bool is_replica_primary = 1;
+    string primary_replica_ip = 2;
+    int32 primary_replica_port = 3;
+    string replica_name = 4;
+    Status status = 5;
+  }
+
+message GetReplicaListRequest {
+  }
+
+message GetReplicaListResponse {
+    repeated string servers = 1;  // list of ip:port
+  }
