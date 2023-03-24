@@ -4,9 +4,11 @@ import "status.proto";
 import "time_stamp.proto";
 
 service ServerService {
-    rpc write (WriteRequest) returns (WriteResponse) {};
+    rpc writeFromClient (WriteRequest) returns (stream WriteResponse) {};
+    rpc writeFromPrimary (WriteRequest) returns (WriteResponse) {};
     rpc read (ReadRequest) returns (ReadResponse) {};
-    rpc delete (DeleteRequest) returns (Status) {};
+    rpc deleteFromPrimary (DeleteRequest) returns (Status) {};
+    rpc deleteFromClient (DeleteRequest) returns (stream Status) {};
     rpc SendReplicaInfoToPrimary(SendReplicaInfoToPrimaryRequest) returns (SendReplicaInfoToPrimaryResponse) {};
 }
 
@@ -27,7 +29,6 @@ message WriteRequest {
     string file_name = 1;
     string file_content = 2;
     string uuid = 3;
-    int32 is_write_from_client = 4;
 }
 
 message WriteResponse {
@@ -38,7 +39,6 @@ message WriteResponse {
 
 message DeleteRequest {
     string uuid = 1;
-    int32 is_delete_from_client = 2;
 }
 
 message ReadRequest {

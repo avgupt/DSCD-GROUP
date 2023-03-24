@@ -15,8 +15,13 @@ class ServerServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.write = channel.unary_unary(
-                '/ServerService/write',
+        self.writeFromClient = channel.unary_stream(
+                '/ServerService/writeFromClient',
+                request_serializer=server__service__pb2.WriteRequest.SerializeToString,
+                response_deserializer=server__service__pb2.WriteResponse.FromString,
+                )
+        self.writeFromPrimary = channel.unary_unary(
+                '/ServerService/writeFromPrimary',
                 request_serializer=server__service__pb2.WriteRequest.SerializeToString,
                 response_deserializer=server__service__pb2.WriteResponse.FromString,
                 )
@@ -25,8 +30,13 @@ class ServerServiceStub(object):
                 request_serializer=server__service__pb2.ReadRequest.SerializeToString,
                 response_deserializer=server__service__pb2.ReadResponse.FromString,
                 )
-        self.delete = channel.unary_unary(
-                '/ServerService/delete',
+        self.deleteFromPrimary = channel.unary_unary(
+                '/ServerService/deleteFromPrimary',
+                request_serializer=server__service__pb2.DeleteRequest.SerializeToString,
+                response_deserializer=status__pb2.Status.FromString,
+                )
+        self.deleteFromClient = channel.unary_stream(
+                '/ServerService/deleteFromClient',
                 request_serializer=server__service__pb2.DeleteRequest.SerializeToString,
                 response_deserializer=status__pb2.Status.FromString,
                 )
@@ -40,7 +50,13 @@ class ServerServiceStub(object):
 class ServerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def write(self, request, context):
+    def writeFromClient(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def writeFromPrimary(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -52,7 +68,13 @@ class ServerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def delete(self, request, context):
+    def deleteFromPrimary(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def deleteFromClient(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -67,8 +89,13 @@ class ServerServiceServicer(object):
 
 def add_ServerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'write': grpc.unary_unary_rpc_method_handler(
-                    servicer.write,
+            'writeFromClient': grpc.unary_stream_rpc_method_handler(
+                    servicer.writeFromClient,
+                    request_deserializer=server__service__pb2.WriteRequest.FromString,
+                    response_serializer=server__service__pb2.WriteResponse.SerializeToString,
+            ),
+            'writeFromPrimary': grpc.unary_unary_rpc_method_handler(
+                    servicer.writeFromPrimary,
                     request_deserializer=server__service__pb2.WriteRequest.FromString,
                     response_serializer=server__service__pb2.WriteResponse.SerializeToString,
             ),
@@ -77,8 +104,13 @@ def add_ServerServiceServicer_to_server(servicer, server):
                     request_deserializer=server__service__pb2.ReadRequest.FromString,
                     response_serializer=server__service__pb2.ReadResponse.SerializeToString,
             ),
-            'delete': grpc.unary_unary_rpc_method_handler(
-                    servicer.delete,
+            'deleteFromPrimary': grpc.unary_unary_rpc_method_handler(
+                    servicer.deleteFromPrimary,
+                    request_deserializer=server__service__pb2.DeleteRequest.FromString,
+                    response_serializer=status__pb2.Status.SerializeToString,
+            ),
+            'deleteFromClient': grpc.unary_stream_rpc_method_handler(
+                    servicer.deleteFromClient,
                     request_deserializer=server__service__pb2.DeleteRequest.FromString,
                     response_serializer=status__pb2.Status.SerializeToString,
             ),
@@ -98,7 +130,7 @@ class ServerService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def write(request,
+    def writeFromClient(request,
             target,
             options=(),
             channel_credentials=None,
@@ -108,7 +140,24 @@ class ServerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerService/write',
+        return grpc.experimental.unary_stream(request, target, '/ServerService/writeFromClient',
+            server__service__pb2.WriteRequest.SerializeToString,
+            server__service__pb2.WriteResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def writeFromPrimary(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ServerService/writeFromPrimary',
             server__service__pb2.WriteRequest.SerializeToString,
             server__service__pb2.WriteResponse.FromString,
             options, channel_credentials,
@@ -132,7 +181,7 @@ class ServerService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def delete(request,
+    def deleteFromPrimary(request,
             target,
             options=(),
             channel_credentials=None,
@@ -142,7 +191,24 @@ class ServerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ServerService/delete',
+        return grpc.experimental.unary_unary(request, target, '/ServerService/deleteFromPrimary',
+            server__service__pb2.DeleteRequest.SerializeToString,
+            status__pb2.Status.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def deleteFromClient(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/ServerService/deleteFromClient',
             server__service__pb2.DeleteRequest.SerializeToString,
             status__pb2.Status.FromString,
             options, channel_credentials,
