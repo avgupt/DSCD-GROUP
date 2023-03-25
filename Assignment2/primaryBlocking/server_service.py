@@ -10,6 +10,7 @@ from time_stamp_pb2 import Date, Time, TimeStamp
 from pathlib import Path
 import datetime
 import os
+import sys
 
 
 
@@ -209,7 +210,7 @@ class Server:
         server.wait_for_termination()
 
 if __name__ == "__main__":
-    port = input("Enter port for server: ")
-
+    # port = input("Enter port for server: ")
+    port = sys.argv[1]
     myServer = Server(port)
     myServer.start()
