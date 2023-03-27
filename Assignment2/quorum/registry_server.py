@@ -19,10 +19,10 @@ class RegistryServerService(registry_server_service_pb2_grpc.RegistryServerServi
         response = servers    
         if request.type == Request.REQUEST_TYPE.READ:
             # randomly select Nr servers
-            response = random.choices(servers, Nr)
+            response = random.sample(servers, k=Nr)
         elif request.type == Request.REQUEST_TYPE.WRITE or request.type == Request.REQUEST_TYPE.DELETE:
-            response = random.choices(servers, Nw)
-        return Response(response)
+            response = random.sample(servers, k=Nw)
+        return Response(server_list=response)
 
     def connect(self, request, context):
         # Assumption: no duplicate servers.

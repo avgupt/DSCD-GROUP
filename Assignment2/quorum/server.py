@@ -49,6 +49,8 @@ class ServerService(server_service_pb2_grpc.ServerServiceServicer):
         is_in_map = request.uuid in memory_map.keys()
         is_in_system = os.path.exists(file_path)
 
+        print("Write request received")
+
         if is_in_map:
             if not is_in_system or memory_map[request.uuid][0] == "":
                 return self.__send_write_failure("DELETED FILE CANNOT BE UPDATED")
