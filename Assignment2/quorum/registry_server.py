@@ -25,6 +25,8 @@ class RegistryServerService(registry_server_service_pb2_grpc.RegistryServerServi
         return Response(response)
 
     def connect(self, request, context):
+        # Assumption: no duplicate servers.
+        print("Request received from LOCALHOST:" + request.port)
         servers.append(request)
         return Status(type=Status.STATUS_TYPE.SUCCESS)
 
