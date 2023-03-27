@@ -166,7 +166,6 @@ class Server:
 
 if __name__ == "__main__":
     port = input("Enter port for server: ")
-    f = open("myfile.txt", "x")
 
     myServer = Server(port)
     data_path = myServer.datastore_path
