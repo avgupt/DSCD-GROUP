@@ -1,8 +1,7 @@
 from concurrent import futures
-import logging, random
+import logging, random, sys
 
 import grpc
-import protos.registry_server_service_pb2 as registry_server_service_pb2 
 import protos.registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
 
 from protos.registry_server_service_pb2 import Request, Response
@@ -51,7 +50,12 @@ def input_constraints():
     return Nr, Nw, N
 
 if __name__ == '__main__':
-    Nr, Nw, N = input_constraints()
+    # Nr, Nw, N = input_constraints()
+    # Nr = int(sys.argv[1])
+    # Nw = int(sys.argv[2])
+    # N = int(sys.argv[3])
+
+    Nr, Nw, N = 3, 3, 4
 
     while(not is_quorum_valid()):
         print("ERROR: Enter valid constraints.\n")

@@ -54,6 +54,8 @@ def write(name, content, uuid):
         print_write_response(response)
 
 def get_datetime_obj(timestamp):
+    if type(timestamp) == type(datetime.now()):
+        return timestamp
     return datetime(
         day=timestamp.date.day, month=timestamp.date.month, year=timestamp.date.year,
         hour=timestamp.time.hour, minute=timestamp.time.minute, second=timestamp.time.second
@@ -74,8 +76,8 @@ def print_read_response(response, server):
         print("Version", get_version(response.version))
 
 
-def read(uuid):
-    server_list = get_servers(Request.REQUEST_TYPE.READ)
+def read(uuid, request):
+    server_list = get_servers(request)
     latest_timestamp = None
     latest_response = None
     latest_server = None
@@ -86,15 +88,19 @@ def read(uuid):
             stub = server_service_pb2_grpc.ServerServiceStub(channel)
             response = stub.read(FileRequest(uuid=uuid))
             print(RESPONSE_PRINT_MSG)
-        if response.status.type == Status.STATUS_TYPE.FAILURE:
+        if not latest_timestamp:
             latest_response = response
-            latest_server = server_address
-            print_read_response(latest_response, latest_server)
-            return None
+            latest_server = server_address  
+        if response.status.type == Status.STATUS_TYPE.FAILURE:
+            if response.status.message == "FILE ALREADY DELETED":
+                latest_timestamp = datetime.now()
+                latest_response = response
+                latest_server = server_address
         elif compare_timestamp(response.version, latest_timestamp):
             latest_timestamp = response.version
             latest_response = response
             latest_server = server_address
+        print_read_response(response, server)
     print_read_response(latest_response, latest_server)        
 
 
@@ -110,18 +116,40 @@ def delete(uuid):
         get_status_bool(response)   
 
 # MAIN
-uuid_string_1 = str(uuid.uuid1())
-uuid_string_2 = str("hghd87377673")
-print(uuid_string_1, uuid_string_2)
+uuid_string_1 = str(uuid.uuid4())
+uuid_string_2 = str(uuid.uuid4())
 
 print_all_servers()
-x = input("Intervention: ")
-write("hello_world_new", "this is testing", uuid_string_1)
-x = input("Intervention: ")
-read(uuid_string_1)
-x = input("Intervention: ")
-read(uuid_string_2)
-x = input("Intervention: ")
-delete(uuid_string_2)
-x = input("Intervention: ")
+print("_________________________________________________")
+
+# Part d
+print("\nWRITE CALL")
+print("UUID:", uuid_string_1)
+write("first_write", "This is first write call.", uuid_string_1)
+print("_________________________________________________")
+
+# Part e
+print("\nREAD CALL")
+read(uuid_string_1, Request.REQUEST_TYPE.GET)
+print("_________________________________________________")
+
+# Part f
+print("\nWRITE CALL")
+print("UUID:", uuid_string_2)
+write("second_write", "THis is second write call", uuid_string_2)
+print("_________________________________________________")
+
+# Part g
+print("\nREAD CALL")
+read(uuid_string_2, Request.REQUEST_TYPE.GET)
+print("_________________________________________________")
+
+# Part h
+print("\nDELETE CALL")
 delete(uuid_string_1)
+print("_________________________________________________")
+
+# Part i
+print("\nREAD CALL")
+read(uuid_string_1, Request.REQUEST_TYPE.GET)
+print("_________________________________________________")

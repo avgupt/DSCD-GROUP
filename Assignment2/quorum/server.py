@@ -1,11 +1,9 @@
 from concurrent import futures
-import logging, os, random, shutil
+import os, sys, shutil
 from datetime import datetime
 
 import grpc
-import protos.registry_server_service_pb2 as registry_server_service_pb2 
 import protos.registry_server_service_pb2_grpc as registry_server_service_pb2_grpc
-import protos.server_service_pb2 as server_service_pb2
 import protos.server_service_pb2_grpc as server_service_pb2_grpc
 
 from protos.server_pb2 import Server as Server_proto
@@ -167,7 +165,8 @@ class Server:
 
 
 if __name__ == "__main__":
-    port = input("Enter port for server: ")
+    # port = input("Enter port for server: ")
+    port = sys.argv[1]
 
     myServer = Server(port)
     data_path = myServer.datastore_path
