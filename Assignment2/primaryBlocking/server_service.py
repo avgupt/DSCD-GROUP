@@ -52,7 +52,7 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
     
     def deleteFile(self, file_uuid):
         file_name = self.key_value_pairs[file_uuid][0]
-        print(file_name)
+        # print(file_name)
         file_path = self.path + "\\" + file_name
         if os.path.isfile(file_path):       
             os.remove(file_path)
