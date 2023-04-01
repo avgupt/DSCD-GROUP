@@ -89,6 +89,8 @@ def read(uuid):
         if response.status.type == Status.STATUS_TYPE.FAILURE:
             latest_response = response
             latest_server = server_address
+            print_read_response(latest_response, latest_server)
+            return None
         elif compare_timestamp(response.version, latest_timestamp):
             latest_timestamp = response.version
             latest_response = response
