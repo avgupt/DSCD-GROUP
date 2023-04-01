@@ -11,6 +11,7 @@ from pathlib import Path
 import datetime
 import os
 import time
+import sys
 
 import threading
 
@@ -52,7 +53,7 @@ class ServerServicer(server_pb2_grpc.ServerServiceServicer):
     
     def deleteFile(self, file_uuid):
         file_name = self.key_value_pairs[file_uuid][0]
-        print(file_name)
+        # print(file_name)
         file_path = self.path + "\\" + file_name
         if os.path.isfile(file_path):       
             os.remove(file_path)
@@ -216,7 +217,7 @@ class Server:
         server.wait_for_termination()
 
 if __name__ == "__main__":
-    port = input("Enter port for server: ")
-
+    # port = input("Enter port for server: ")
+    port = sys.argv[1]
     myServer = Server(port)
     myServer.start()
