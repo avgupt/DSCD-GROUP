@@ -73,50 +73,50 @@ class Client:
             return response
         
 
-# if __name__== "__main__":
-#     myClient = Client()
-#     file_dict = {}
-#     count = 0
+if __name__== "__main__":
+    myClient = Client()
+    file_dict = {}
+    count = 0
     
-#     while(True):
-#         print()
-#         print("GetReplicaList[1], Write[2], Read[3], Delete[4], Update[5]:")
-#         n = int(input())
+    while(True):
+        print()
+        print("GetReplicaList[1], Write[2], Read[3], Delete[4], Update[5]:")
+        n = int(input())
 
-#         if n == 1:
-#             myClient.getReplicaListFromRegistryServer()
+        if n == 1:
+            myClient.getReplicaListFromRegistryServer()
         
-#         elif n > 5:
-#             print("INVALID REQUEST")
-#         else:
-#             server_name = input("Enter server port: ")
-#             server_name = "localhost:"+server_name
+        elif n > 5:
+            print("INVALID REQUEST")
+        else:
+            server_name = input("Enter server port: ")
+            server_name = "localhost:"+server_name
 
-#             if n == 2:
-#                 count+=1
-#                 file_name = input("Enter file name ([name].txt): ")
-#                 file_content = input("Enter file content: ")
-#                 file_uuid = str(uuid.uuid1())
-#                 file_dict[count] = file_uuid
-#                 myClient.write(file_name, file_content, file_uuid, server_name)
+            if n == 2:
+                count+=1
+                file_name = input("Enter file name ([name].txt): ")
+                file_content = input("Enter file content: ")
+                file_uuid = str(uuid.uuid1())
+                file_dict[count] = file_uuid
+                myClient.write(file_name, file_content, file_uuid, server_name)
 
-#             elif n == 3:
-#                 # file_uuid_no = input("Enter file number: ")
-#                 # file_uuid = file_dict[file_uuid_no]
-#                 file_uuid = input("Enter file uuid: ")
-#                 myClient.read(file_uuid, server_name)
+            elif n == 3:
+                # file_uuid_no = input("Enter file number: ")
+                # file_uuid = file_dict[file_uuid_no]
+                file_uuid = input("Enter file uuid: ")
+                myClient.read(file_uuid, server_name)
 
-#             elif n == 4: 
-#                 file_uuid = input("Enter file uuid: ")
-#                 # file_uuid_no = int(input("Enter file number (in order of file written): "))
-#                 # file_uuid = file_dict[file_uuid_no]
-#                 # file_uuid = str(uuid.uuid1()) #Trial for Case 1: delete
-#                 myClient.delete(file_uuid, server_name)
+            elif n == 4: 
+                file_uuid = input("Enter file uuid: ")
+                # file_uuid_no = int(input("Enter file number (in order of file written): "))
+                # file_uuid = file_dict[file_uuid_no]
+                # file_uuid = str(uuid.uuid1()) #Trial for Case 1: delete
+                myClient.delete(file_uuid, server_name)
 
-#             else:
-#                 # file_uuid_no = int(input("Enter file number (in order of file written): "))
-#                 # file_uuid = file_dict[file_uuid_no]
-#                 file_uuid = input("Enter file uuid: ")
-#                 file_name = input("Enter the same file name ([name].txt): ")
-#                 file_content = input("Enter file content: ")
-#                 myClient.write(file_name, file_content, file_uuid, server_name)
+            else:
+                # file_uuid_no = int(input("Enter file number (in order of file written): "))
+                # file_uuid = file_dict[file_uuid_no]
+                file_uuid = input("Enter file uuid: ")
+                file_name = input("Enter the same file name ([name].txt): ")
+                file_content = input("Enter file content: ")
+                myClient.write(file_name, file_content, file_uuid, server_name)
