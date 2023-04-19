@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+service ServerService {
+    rpc map (MapRequest) returns (MapResponse) {};
+}
+
+message MapRequest{
+}
+
+message MapResponse{
+}
