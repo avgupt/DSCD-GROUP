@@ -1,11 +1,15 @@
 syntax = "proto3";
 
-service ServerService {
+service MapperService {
     rpc map (MapRequest) returns (MapResponse) {};
 }
 
 message MapRequest{
+    int32 query = 1;
+    string input_location = 2;
+    repeated string input_split_files = 3;
 }
 
 message MapResponse{
+    // returns partitions
 }
