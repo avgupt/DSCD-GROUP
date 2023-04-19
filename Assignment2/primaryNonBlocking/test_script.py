@@ -9,10 +9,10 @@ import uuid
 
 REPLICA_PORTS = [8080, 8081, 8082]
 REPLICA_ADDRESSES = ["localhost:8080", "localhost:8081", "localhost:8082"]
-FILE1_NAME = "file1"
+FILE1_NAME = "file1.txt"
 FILE1_CONTENT = "This is file 1 text"
 
-FILE2_NAME = "file2"
+FILE2_NAME = "file2.txt"
 FILE2_CONTENT = "This is file 2 text"
 
 # Start registry server
