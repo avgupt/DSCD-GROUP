@@ -11,5 +11,11 @@ message MapRequest{
 }
 
 message MapResponse{
-    // returns partitions
+    enum Status {
+        FAILED = 0;
+        SUCCESS = 1;
+    }
+    string intermediate_file_location = 1;
+    Status status = 2;
+    
 }

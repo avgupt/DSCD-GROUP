@@ -49,7 +49,7 @@ class Master:
         mappers_process = []
         for mapper_name, port in mappers.items():
             mapper = subprocess.Popen(['python', 'mapper_service.py', str(port), mapper_name])
-            print("mapper pid",mapper.pid)
+            print("mapper pid", mapper.pid)
             mappers_process.append(mapper)
             time.sleep(1)
         return mappers_process
@@ -58,6 +58,25 @@ class Master:
         print("Terminating mappers...")
         for mapper in mappers_process:
             mapper.terminate()
+
+    
+    def map(self, mapper_to_files_mapping):
+        print(mapper_to_files_mapping[1])
+        num = 1
+        for mapper_name, port in self.mappers.items():
+            with grpc.insecure_channel('localhost:' + str(port), options=(('grpc.enable_http_proxy', 0),)) as channel:
+                stub = mapper_pb2_grpc.MapperServiceStub(channel)
+                response = stub.map(mapper_pb2.MapRequest(query=self.query, input_location=self.input_location, input_split_files=mapper_to_files_mapping[num]))
+                
+                if response.status == mapper_pb2.MapResponse.Status.SUCCESS:
+                    print("Status : SUCCESS")
+                    print("Location of Intermediate data :", response.intermediate_file_location)
+                
+                else:
+                    print("Status : FAILURE")
+              
+            num += 1
+
 
 
 if __name__ == '__main__':
@@ -70,6 +89,14 @@ if __name__ == '__main__':
     mappers = input("Enter ports of mappers separated by space (eg. 8080 8081 8082):").split()
     n_reducers = int(input("Enter R (no of reducers): "))
     reducers = input("Enter ports of reducers separated by space (eg. 8080 8081 8082):").split()
+
+    # query = 1
+    # input_location = 'wordCount\input'
+    # output_location = 'wordCount\output'
+    # n_mappers = 2
+    # mappers = [8084, 8085]
+    # n_reducers = 2
+    # reducers = [8086, 8087]
 
     mappers_new = {}
     m = 1
@@ -88,5 +115,6 @@ if __name__ == '__main__':
     master = Master(query, input_location, n_mappers, n_reducers, mappers_new, reducers_new, output_location)
     mappers_process = master.spawn_mappers(mappers_new)
     mapper_to_files_mapping = master.input_split()
-    print(mapper_to_files_mapping)
+    # print(mapper_to_files_mapping)
+    master.map(mapper_to_files_mapping)
     master.terminate_mappers(mappers_process)

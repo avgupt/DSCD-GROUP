@@ -12,22 +12,49 @@ import sys
 class MapperServiceServicer(mapper_pb2_grpc.MapperServiceServicer):
     def __init__(self, mapper_name):
         self.mapper_name = mapper_name
-        self.query = 1
+        self.path = "folders\\" + "ID_" + mapper_name
+        self.intermediate_data = {}
+        Path(self.path).mkdir(parents=True, exist_ok=True)
     
-    def _wordCount():
-        return  
+    def file_read(self, path):
+        with open(path, "r") as file:
+            file_content = file.read()
+        return file_content
+    
+    def file_write(self, path, content):
+        with open(path, "a+") as file:
+            file.write(content + "\n")
 
-    def _map(self):
-        # Word Count
-        if (self.query == 1):
-            return self._wordCount()
-        elif (self.query == 2):
-            return self._invertedIndex()
-        elif (self.query == 3):
-            return self._naturalJoin()
-        elif (self.query == 4):
-            return self._customFunction()
-        return 
+    def partition(self, query, key, r):
+        if (query == 1):
+            partition_number = len(key)%r
+
+        # TODO(Avishi): Partition functions for others
+        return str(partition_number)
+    
+    def _wordCount(self, request):
+        #TODO(Manvi): Implement line wise processing if needed
+        for file_name in request.input_split_files:
+            file_content = self.file_read(request.input_location + "\\" + file_name).split()
+
+            for key in file_content:
+                value = 1
+                partion_name = self.partition(request.query, key, 2)
+                self.file_write(self.path + "\\P" + partion_name, key + " " + str(value))
+                
+        return mapper_pb2.MapResponse(intermediate_file_location = self.path, status = mapper_pb2.MapResponse.Status.SUCCESS)
+
+    def map(self, request, context):
+        
+        if request.query == 1:
+            return self._wordCount(request)
+        
+        # TODO(Avishi): Other Function
+        elif request.query == 2:
+            return self._invertedIndex(request)
+        
+
+        return self._naturalJoin(request)
 
 
 class Mapper:
