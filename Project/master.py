@@ -4,46 +4,19 @@ import logging
 import grpc
 import  mapper_service_pb2 as mapper_pb2
 import mapper_service_pb2_grpc as mapper_pb2_grpc
-import master_service_pb2 as master_service_pb2 
-import master_service_pb2_grpc as master_service_pb2_grpc
 import os
-
-
-class MasterService(master_service_pb2_grpc.MasterServiceServicer):
-    def __init__(self, query, n_mappers, n_reducers):
-        self.query = query
-        self.n_mappers = n_mappers
-        self.n_reducers = n_reducers
-        self.mappers = []
-        self.reducers = []
-
-    def RegisterMapper(self, request, context):
-        ip = request.ip
-        port = request.port
-        address = ip + ':'+ str(port)
-        print("JOIN REQUEST FROM", address)
-
-        if len(self.mappers) == self.n_mappers:
-            print("Can't register, enough mappers live:",address)
-            return master_service_pb2.RegisterMapperResponse(status=master_service_pb2.RegisterMapperResponse.FAILED)
-
-        if address in self.mappers:
-            print("Can't register, port already in use:",address)
-            return master_service_pb2.RegisterMapperResponse(status=master_service_pb2.RegisterMapperResponse.FAILED)
-
-        mapper_name = 'mapper_' + str(len(self.mappers))
-        self.mappers.append(address)
-        print("Mapper registered to Master, mapper address:",address)
-        return master_service_pb2.RegisterMapperResponse(mapper_name=mapper_name,status=master_service_pb2.RegisterMapperResponse.SUCCESS)
-
+import time
+import subprocess
 
 class Master:
-    def __init__(self, query, input_location, n_mappers, n_reducers, output_location):
+    def __init__(self, query, input_location, n_mappers, n_reducers, mappers, reducers, output_location):
         self.query = query
         self.input_location = input_location #ex: wordCount\\input
         self.n_mappers = n_mappers
         self.n_reducers = n_reducers
         self.output_location = output_location
+        self.mappers = mappers
+        self.reducers = reducers
 
     def input_split(self):
         files = os.listdir(self.input_location)
@@ -71,15 +44,20 @@ class Master:
             file_i = file_i + 1
             mapper_i = mapper_i + 1
         return mapper_to_files_mapping
+    
+    def spawn_mappers(self, mappers):
+        mappers_process = []
+        for mapper_name, port in mappers.items():
+            mapper = subprocess.Popen(['python', 'mapper_service.py', str(port), mapper_name])
+            print("mapper pid",mapper.pid)
+            mappers_process.append(mapper)
+            time.sleep(1)
+        return mappers_process
 
-    def serve(self):
-        port = '50051'
-        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        master_service_pb2_grpc.add_MasterServiceServicer_to_server(MasterService(self.query,self.n_mappers,self.n_reducers), server)
-        server.add_insecure_port('[::]:' + port)
-        server.start()
-        print("Master started, listening on " + port)
-        server.wait_for_termination()
+    def terminate_mappers(self, mappers_process):
+        print("Terminating mappers...")
+        for mapper in mappers_process:
+            mapper.terminate()
 
 
 if __name__ == '__main__':
@@ -89,9 +67,26 @@ if __name__ == '__main__':
     input_location = input("Enter input data location(folder name example: 'wordCount\\input'): ")
     output_location = input("Enter output data location(folder name example: 'wordCount\\output'): ")
     n_mappers = int(input("Enter M (no of mappers): "))
+    mappers = input("Enter ports of mappers separated by space (eg. 8080 8081 8082):").split()
     n_reducers = int(input("Enter R (no of reducers): "))
+    reducers = input("Enter ports of reducers separated by space (eg. 8080 8081 8082):").split()
 
-    master = Master(query, input_location, n_mappers, n_reducers, output_location)
+    mappers_new = {}
+    m = 1
+    for port in mappers:
+        mapper_name = 'mapper_' + str(m)
+        mappers_new[mapper_name] = port
+        m = m + 1
+
+    reducers_new = {}
+    r = 1
+    for port in reducers:
+        reducer_name = 'reducer_' + str(r)
+        reducers_new[reducer_name] = port
+        r = r + 1
+
+    master = Master(query, input_location, n_mappers, n_reducers, mappers_new, reducers_new, output_location)
+    mappers_process = master.spawn_mappers(mappers_new)
     mapper_to_files_mapping = master.input_split()
     print(mapper_to_files_mapping)
-    master.serve()
+    master.terminate_mappers(mappers_process)
