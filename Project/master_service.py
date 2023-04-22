@@ -85,7 +85,7 @@ class Master:
 if __name__ == '__main__':
     logging.basicConfig()
 
-    query = int(input("Enter query to perform WordCount[1], InvertedINdex[2], NaturalJoin[3]: ")) # valid input should be given
+    query = int(input("Enter query to perform WordCount[1], InvertedIndex[2], NaturalJoin[3]: ")) # valid input should be given
     input_location = input("Enter input data location(folder name example: 'wordCount\\input'): ")
     output_location = input("Enter output data location(folder name example: 'wordCount\\output'): ")
     n_mappers = int(input("Enter M (no of mappers): "))
