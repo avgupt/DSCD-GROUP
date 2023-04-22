@@ -39,7 +39,7 @@ class MapperServiceServicer(mapper_pb2_grpc.MapperServiceServicer):
 
             for key in file_content:
                 value = 1
-                partion_name = self.partition(request.query, key, 2)
+                partion_name = self.partition(request.query, key, request.n_reducers)
                 self.file_write(self.path + "\\P" + partion_name, key + " " + str(value))
                 
         return mapper_pb2.MapResponse(intermediate_file_location = self.path, status = mapper_pb2.MapResponse.Status.SUCCESS)

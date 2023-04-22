@@ -4,6 +4,8 @@ import logging
 import grpc
 import  mapper_service_pb2 as mapper_pb2
 import mapper_service_pb2_grpc as mapper_pb2_grpc
+import  reducer_service_pb2 as reducer_pb2
+import reducer_service_pb2_grpc as reducer_pb2_grpc
 import os
 import time
 import subprocess
@@ -53,29 +55,68 @@ class Master:
             mappers_process.append(mapper)
             time.sleep(1)
         return mappers_process
+    
+    def spawn_reducers(self, reducers):
+        reducers_process = []
+        for reducer_name, port in reducers.items():
+            reducer = subprocess.Popen(['python', 'reducer_service.py', str(port), reducer_name])
+            print("reducer pid", reducer.pid)
+            reducers_process.append(reducer)
+            time.sleep(1)
+        return reducers_process
 
     def terminate_mappers(self, mappers_process):
         print("Terminating mappers...")
         for mapper in mappers_process:
             mapper.terminate()
+    
+    def terminate_reducers(self, reducers_process):
+        print("Terminating reducers...")
+        for reducer in reducers_process:
+            reducer.terminate()
 
     
     def map(self, mapper_to_files_mapping):
         print(mapper_to_files_mapping[1])
         num = 1
+        intermediate_file_locations = []
         for mapper_name, port in self.mappers.items():
             with grpc.insecure_channel('localhost:' + str(port), options=(('grpc.enable_http_proxy', 0),)) as channel:
                 stub = mapper_pb2_grpc.MapperServiceStub(channel)
-                response = stub.map(mapper_pb2.MapRequest(query=self.query, input_location=self.input_location, input_split_files=mapper_to_files_mapping[num]))
+                response = stub.map(mapper_pb2.MapRequest(query=self.query, input_location=self.input_location, input_split_files=mapper_to_files_mapping[num], n_reducers=self.n_reducers))
                 
                 if response.status == mapper_pb2.MapResponse.Status.SUCCESS:
                     print("Status : SUCCESS")
                     print("Location of Intermediate data :", response.intermediate_file_location)
+                    intermediate_file_locations.append(response.intermediate_file_location)
                 
                 else:
                     print("Status : FAILURE")
               
             num += 1
+        return intermediate_file_locations
+    
+    def reduce(self, intermediate_file_locations):
+        num = 1
+        for reducer_name, port in self.reducers.items():
+            partition = num - 1
+            partition_paths = []
+            for path in intermediate_file_locations:
+                partition_file_path = path + "\\P" + str(partition)
+                partition_paths.append(partition_file_path)
+            with grpc.insecure_channel('localhost:' + str(port), options=(('grpc.enable_http_proxy', 0),)) as channel:
+                stub = reducer_pb2_grpc.ReducerServiceStub(channel)
+                response = stub.reduce(reducer_pb2.ReduceRequest(query=self.query, partition_files_path=partition_paths, output_location=self.output_location))
+                
+                if response.status == reducer_pb2.ReduceResponse.Status.SUCCESS:
+                    print("Status : SUCCESS")
+                    print("Location of Output data :", response.output_file_path)
+                
+                else:
+                    print("Status : FAILURE")
+              
+            num += 1
+        return intermediate_file_locations
 
 
 
@@ -84,7 +125,7 @@ if __name__ == '__main__':
 
     query = int(input("Enter query to perform WordCount[1], InvertedIndex[2], NaturalJoin[3]: ")) # valid input should be given
     input_location = input("Enter input data location(folder name example: 'wordCount\\input'): ")
-    output_location = input("Enter output data location(folder name example: 'wordCount\\output'): ")
+    output_location = input("Enter output data location(folder name example: 'wordCount\\reducer'): ")
     n_mappers = int(input("Enter M (no of mappers): "))
     mappers = input("Enter ports of mappers separated by space (eg. 8080 8081 8082):").split()
     n_reducers = int(input("Enter R (no of reducers): "))
@@ -115,6 +156,10 @@ if __name__ == '__main__':
     master = Master(query, input_location, n_mappers, n_reducers, mappers_new, reducers_new, output_location)
     mappers_process = master.spawn_mappers(mappers_new)
     mapper_to_files_mapping = master.input_split()
-    # print(mapper_to_files_mapping)
-    master.map(mapper_to_files_mapping)
+
+    intermediate_file_locations = master.map(mapper_to_files_mapping)
     master.terminate_mappers(mappers_process)
+
+    reducers_process = master.spawn_reducers(reducers_new)
+    master.reduce(intermediate_file_locations)
+    master.terminate_reducers(reducers_process)
