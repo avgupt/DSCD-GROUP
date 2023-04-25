@@ -14,47 +14,57 @@ class MapperServiceServicer(mapper_pb2_grpc.MapperServiceServicer):
         self.mapper_name = mapper_name
         self.path = "folders\\" + "ID_" + mapper_name
         self.intermediate_data = {}
+        self.n_reducers = 0
+        self.query = 0
         Path(self.path).mkdir(parents=True, exist_ok=True)
     
     def file_read(self, path):
         with open(path, "r") as file:
-            file_content = file.read()
+            file_content = file.read().splitlines()
         return file_content
     
     def file_write(self, path, content):
         with open(path, "a+") as file:
             file.write(content + "\n")
 
-    def partition(self, query, key, r):
-        if (query == 1):
-            partition_number = len(key)%r
+    def partition(self, key):
+        if (self.query < 3):
+            partition_number = len(key)%(self.n_reducers)
 
         # TODO(Avishi): Partition functions for others
         return str(partition_number)
     
-    def _wordCount(self, request):
-        #TODO(Manvi): Implement line wise processing if needed
-        for file_name in request.input_split_files:
-            file_content = self.file_read(request.input_location + "\\" + file_name).split()
-
-            for key in file_content:
-                value = 1
-                partion_name = self.partition(request.query, key, request.n_reducers)
-                self.file_write(self.path + "\\P" + partion_name, key + " " + str(value))
+    def _wordCount(self, key, value):
+        for word in value.split(" "):
+            value = 1
+            partion_name = self.partition(word)
+            self.file_write(self.path + "\\P" + partion_name, word + " " + str(value))
                 
-        return mapper_pb2.MapResponse(intermediate_file_location = self.path, status = mapper_pb2.MapResponse.Status.SUCCESS)
-
+    def _invertedIndex(self, key, value):
+        for line in value:
+            for word in line.split(" "):
+                partition_name = self.partition(word)
+                self.file_write(self.path + "\\P" + partition_name, word + " " + str(key))
+        
+    
     def map(self, request, context):
+        self.n_reducers = request.n_reducers
+        self.query = request.query
         
         if request.query == 1:
-            return self._wordCount(request)
+            for file_name in request.input_split_files:
+                file_content = self.file_read(request.input_location + "\\" + file_name)
+                for line in range(len(file_content)):
+                    response = self._wordCount(line, file_content[line])
         
-        # TODO(Avishi): Other Function
         elif request.query == 2:
-            return self._invertedIndex(request)
+            for file_name in range(len(request.input_split_files)):
+                file_content = self.file_read(request.input_location + "\\" + request.input_split_files[file_name])
+                response = self._invertedIndex(request.input_split_file_id[file_name], file_content)
         
 
-        return self._naturalJoin(request)
+        # TODO(Avishi): Other Function
+        return mapper_pb2.MapResponse(intermediate_file_location = self.path, status = mapper_pb2.MapResponse.Status.SUCCESS)
 
 
 class Mapper:

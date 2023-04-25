@@ -8,7 +8,8 @@ message MapRequest{
     int32 query = 1;
     string input_location = 2;
     repeated string input_split_files = 3;
-    int32 n_reducers = 4;
+    repeated int32 input_split_file_id = 4;
+    int32 n_reducers = 5;
 }
 
 message MapResponse{

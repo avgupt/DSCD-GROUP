@@ -9,6 +9,10 @@ import reducer_service_pb2_grpc as reducer_pb2_grpc
 import os
 import time
 import subprocess
+# import pathlib
+import shutil
+from pathlib import Path
+
 
 class Master:
     def __init__(self, query, input_location, n_mappers, n_reducers, mappers, reducers, output_location):
@@ -24,7 +28,7 @@ class Master:
         files = os.listdir(self.input_location)
         print("input files: ", files)
         n_input_files = len(files)
-        mapper_to_files_mapping = {}  # dict of the form {mapper_number: [input1.txt]}
+        mapper_to_files_mapping = {}  # dict of the form {mapper_number: ([input1.txt], 1)}
         chunk_size = n_input_files // self.n_mappers
         mapper_i = 1
         file_i = 0
@@ -33,16 +37,19 @@ class Master:
         while(mapper_i <= self.n_mappers):
             end = file_i + chunk_size
             file_list = []
+            file_id_list = []
             while(file_i<end):
                 file_list.append(files[file_i])
+                file_id_list.append(file_i)
                 file_i = file_i + 1
-            mapper_to_files_mapping[mapper_i] = file_list
+            mapper_to_files_mapping[mapper_i] = [file_list, file_id_list]
             mapper_i  = mapper_i + 1
 
         # assignig remaining files (1 to each mapper)
         mapper_i = 1
         while(file_i < n_input_files):
-            mapper_to_files_mapping[mapper_i].append(files[file_i])
+            mapper_to_files_mapping[mapper_i][0].append(files[file_i])
+            mapper_to_files_mapping[mapper_i][1].append(file_i)
             file_i = file_i + 1
             mapper_i = mapper_i + 1
         return mapper_to_files_mapping
@@ -83,7 +90,7 @@ class Master:
         for mapper_name, port in self.mappers.items():
             with grpc.insecure_channel('localhost:' + str(port), options=(('grpc.enable_http_proxy', 0),)) as channel:
                 stub = mapper_pb2_grpc.MapperServiceStub(channel)
-                response = stub.map(mapper_pb2.MapRequest(query=self.query, input_location=self.input_location, input_split_files=mapper_to_files_mapping[num], n_reducers=self.n_reducers))
+                response = stub.map(mapper_pb2.MapRequest(query=self.query, input_location=self.input_location, input_split_files=mapper_to_files_mapping[num][0], input_split_file_id=mapper_to_files_mapping[num][1], n_reducers=self.n_reducers))
                 
                 if response.status == mapper_pb2.MapResponse.Status.SUCCESS:
                     print("Status : SUCCESS")
@@ -125,15 +132,22 @@ if __name__ == '__main__':
 
     query = int(input("Enter query to perform WordCount[1], InvertedIndex[2], NaturalJoin[3]: ")) # valid input should be given
     input_location = input("Enter input data location(folder name example: 'wordCount\\input'): ")
-    output_location = input("Enter output data location(folder name example: 'wordCount\\reducer'): ")
+    output_location = input("Enter output data location(folder name example: 'output'): ")
     n_mappers = int(input("Enter M (no of mappers): "))
     mappers = input("Enter ports of mappers separated by space (eg. 8080 8081 8082):").split()
     n_reducers = int(input("Enter R (no of reducers): "))
     reducers = input("Enter ports of reducers separated by space (eg. 8080 8081 8082):").split()
 
-    # query = 1
-    # input_location = 'wordCount\input'
-    # output_location = 'wordCount\output'
+    # Delete folder and output
+    if Path("folders").exists():
+        shutil.rmtree("folders")
+    
+    if Path("output").exists():
+        shutil.rmtree("output")
+
+    # query = 2
+    # input_location = 'invertedIndex\input'
+    # output_location = 'output'
     # n_mappers = 2
     # mappers = [8084, 8085]
     # n_reducers = 2
@@ -160,6 +174,6 @@ if __name__ == '__main__':
     intermediate_file_locations = master.map(mapper_to_files_mapping)
     master.terminate_mappers(mappers_process)
 
-    reducers_process = master.spawn_reducers(reducers_new)
-    master.reduce(intermediate_file_locations)
-    master.terminate_reducers(reducers_process)
+    # reducers_process = master.spawn_reducers(reducers_new)
+    # master.reduce(intermediate_file_locations)
+    # master.terminate_reducers(reducers_process)
