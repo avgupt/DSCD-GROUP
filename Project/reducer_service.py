@@ -25,7 +25,20 @@ class ReducerServiceServicer(reducer_pb2_grpc.ReducerServiceServicer):
         self.file_write(final_output_path , key + " " + str(count))
         return final_output_path
     
-    def _wordCount(self, partition_files_path):
+    def invertedIndex_reduce_function(self, key, values):
+        values = list(set(values))
+        output = ""
+        for i in range(len(values)):
+            if i == 0:
+                output = str(values[i])
+            else:
+                output = output + ", "+ str(values[i])
+        final_output_path = self.path + "\\" + self.reducer_name
+        self.file_write(final_output_path , key + " " + output)
+        return final_output_path
+    
+    def _wordCountAndInvertedIndex(self, partition_files_path, query):
+        # shuffle and sort
         self.shuffled_and_sorted_data = {}
         for file_path in partition_files_path:
             with open(file_path, "r") as file:
@@ -38,20 +51,26 @@ class ReducerServiceServicer(reducer_pb2_grpc.ReducerServiceServicer):
                     else:
                         self.shuffled_and_sorted_data[key] = [value]
 
-        for key, value in self.shuffled_and_sorted_data.items():
-            final_output_path = self.wordCount_reduce_function(key, value)
+        # word count
+        if query == 1:
+            for key, value in self.shuffled_and_sorted_data.items():
+                final_output_path = self.wordCount_reduce_function(key, value)
+        
+        # inverted index
+        elif query == 2:
+            for key, value in self.shuffled_and_sorted_data.items():
+                final_output_path = self.invertedIndex_reduce_function(key, value)
 
         return reducer_pb2.ReduceResponse(status=reducer_pb2.ReduceResponse.Status.SUCCESS, output_file_path=final_output_path)
-            
 
 
     def reduce(self, request, context):
         self.path = request.output_location
         Path(self.path).mkdir(parents=True, exist_ok=True)
-        if request.query == 1:
-            return self._wordCount(request.partition_files_path)
+        if request.query == 1 or request.query == 2:
+            return self._wordCountAndInvertedIndex(request.partition_files_path, request.query)
         
-        # TODO(Avishi): Other Function
+        # TODO(Avishi): for natural join
 
 class Reducer:
 

@@ -174,6 +174,6 @@ if __name__ == '__main__':
     intermediate_file_locations = master.map(mapper_to_files_mapping)
     master.terminate_mappers(mappers_process)
 
-    # reducers_process = master.spawn_reducers(reducers_new)
-    # master.reduce(intermediate_file_locations)
-    # master.terminate_reducers(reducers_process)
+    reducers_process = master.spawn_reducers(reducers_new)
+    master.reduce(intermediate_file_locations)
+    master.terminate_reducers(reducers_process)
