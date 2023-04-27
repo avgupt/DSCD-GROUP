@@ -12,7 +12,9 @@ import subprocess
 # import pathlib
 import shutil
 from pathlib import Path
+from multiprocessing.pool import ThreadPool
 
+map_intermediate_location = []
 
 class Master:
     def __init__(self, query, input_location, n_mappers, n_reducers, mappers, reducers, output_location):
@@ -82,49 +84,58 @@ class Master:
         for reducer in reducers_process:
             reducer.terminate()
 
-    
-    def map(self, mapper_to_files_mapping):
-        print(mapper_to_files_mapping[1])
-        num = 1
-        intermediate_file_locations = []
-        for mapper_name, port in self.mappers.items():
-            with grpc.insecure_channel('localhost:' + str(port), options=(('grpc.enable_http_proxy', 0),)) as channel:
+    def mapFunction(self, mapper_to_files_mapping, item):
+        num = list(self.mappers.items()).index(item) + 1
+        port = item[1]
+        with grpc.insecure_channel('localhost:' + str(port), options=(('grpc.enable_http_proxy', 0),)) as channel:
                 stub = mapper_pb2_grpc.MapperServiceStub(channel)
                 response = stub.map(mapper_pb2.MapRequest(query=self.query, input_location=self.input_location, input_split_files=mapper_to_files_mapping[num][0], input_split_file_id=mapper_to_files_mapping[num][1], n_reducers=self.n_reducers))
                 
                 if response.status == mapper_pb2.MapResponse.Status.SUCCESS:
                     print("Status : SUCCESS")
                     print("Location of Intermediate data :", response.intermediate_file_location)
-                    intermediate_file_locations.append(response.intermediate_file_location)
+                    map_intermediate_location.append(response.intermediate_file_location)
                 
                 else:
                     print("Status : FAILURE")
-              
-            num += 1
-        return intermediate_file_locations
-    
-    def reduce(self, intermediate_file_locations):
-        num = 1
-        for reducer_name, port in self.reducers.items():
-            partition = num - 1
-            partition_paths = []
-            for path in intermediate_file_locations:
-                partition_file_path = path + "\\P" + str(partition)
-                partition_paths.append(partition_file_path)
-            with grpc.insecure_channel('localhost:' + str(port), options=(('grpc.enable_http_proxy', 0),)) as channel:
-                stub = reducer_pb2_grpc.ReducerServiceStub(channel)
-                response = stub.reduce(reducer_pb2.ReduceRequest(query=self.query, partition_files_path=partition_paths, output_location=self.output_location))
-                
-                if response.status == reducer_pb2.ReduceResponse.Status.SUCCESS:
-                    print("Status : SUCCESS")
-                    print("Location of Output data :", response.output_file_path)
-                
-                else:
-                    print("Status : FAILURE")
-              
-            num += 1
-        return intermediate_file_locations
+        
 
+    def reduceFunction(self, intermediate_file_locations, item):
+        num = list(self.reducers.items()).index(item) + 1
+        port = item[1]
+        partition = num - 1
+        partition_paths = []
+        for path in intermediate_file_locations:
+            partition_file_path = path + "\\P" + str(partition)
+            partition_paths.append(partition_file_path)
+        
+        with grpc.insecure_channel('localhost:' + str(port), options=(('grpc.enable_http_proxy', 0),)) as channel:
+            stub = reducer_pb2_grpc.ReducerServiceStub(channel)
+            response = stub.reduce(reducer_pb2.ReduceRequest(query=self.query, partition_files_path=partition_paths, output_location=self.output_location))
+            
+            if response.status == reducer_pb2.ReduceResponse.Status.SUCCESS:
+                print("Status : SUCCESS")
+                print("Location of Output data :", response.output_file_path)
+            
+            else:
+                print("Status : FAILURE")
+        
+    def map(self, mapper_to_files_mapping):
+        # print(mapper_to_files_mapping[1])
+        input_array = []
+        for i in range(len(list(self.mappers.items()))):
+            input_array.append((mapper_to_files_mapping, list(self.mappers.items())[i]))
+        
+        with ThreadPool() as pool:
+            pool.starmap(self.mapFunction, input_array)
+        
+    def reduce(self, intermediate_file_locations):
+        input_array = []
+        for i in range(len(list(self.reducers.items()))):
+            input_array.append((intermediate_file_locations, list(self.reducers.items())[i]))
+        
+        with ThreadPool() as pool:
+            pool.starmap(self.reduceFunction, input_array)
 
 
 if __name__ == '__main__':
@@ -145,11 +156,11 @@ if __name__ == '__main__':
     if Path("output").exists():
         shutil.rmtree("output")
 
-    # query = 2
-    # input_location = 'invertedIndex\input'
+    # query = 1
+    # input_location = 'wordCount\input'
     # output_location = 'output'
-    # n_mappers = 2
-    # mappers = [8084, 8085]
+    # n_mappers = 3
+    # mappers = [8080, 8081, 8082]
     # n_reducers = 2
     # reducers = [8086, 8087]
 
@@ -171,9 +182,11 @@ if __name__ == '__main__':
     mappers_process = master.spawn_mappers(mappers_new)
     mapper_to_files_mapping = master.input_split()
 
-    intermediate_file_locations = master.map(mapper_to_files_mapping)
+    master.map(mapper_to_files_mapping)
     master.terminate_mappers(mappers_process)
 
+    # print(map_intermediate_location)
+
     reducers_process = master.spawn_reducers(reducers_new)
-    master.reduce(intermediate_file_locations)
+    master.reduce(map_intermediate_location)
     master.terminate_reducers(reducers_process)
