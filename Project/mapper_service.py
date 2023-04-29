@@ -7,12 +7,13 @@ import mapper_service_pb2_grpc as mapper_pb2_grpc
 from pathlib import Path
 import datetime
 import os
+import pandas as pd
 import sys
 
 class MapperServiceServicer(mapper_pb2_grpc.MapperServiceServicer):
     def __init__(self, mapper_name):
         self.mapper_name = mapper_name
-        self.path = "folders\\" + "ID_" + mapper_name
+        self.path = "folders/" + "ID_" + mapper_name
         self.intermediate_data = {}
         self.n_reducers = 0
         self.query = 0
@@ -28,42 +29,75 @@ class MapperServiceServicer(mapper_pb2_grpc.MapperServiceServicer):
             file.write(content + "\n")
 
     def partition(self, key):
-        if (self.query < 3):
-            partition_number = len(key)%(self.n_reducers)
-
-        # TODO(Avishi): Partition functions for others
-        return str(partition_number)
+        return str(len(key)%(self.n_reducers))
     
     def _wordCount(self, key, value):
         for word in value.split(" "):
             value = 1
             partion_name = self.partition(word)
-            self.file_write(self.path + "\\P" + partion_name, word + " " + str(value))
+            self.file_write(self.path + "/P" + partion_name, word + " " + str(value))
                 
     def _invertedIndex(self, key, value):
         for line in value:
             for word in line.split(" "):
                 partition_name = self.partition(word)
-                self.file_write(self.path + "\\P" + partition_name, word + " " + str(key))
+                self.file_write(self.path + "/P" + partition_name, word + " " + str(key))
         
-    
+    def _naturalJoinMapCreator(self, table, common_column):
+        a, b = [], []
+        table.sort_values(common_column)
+        for col in table.columns:
+            if col == common_column:
+                a = list(table[col])
+            else:
+                b = list(table[col])
+        return dict(zip(a, b))
+
+    def _naturalJoin(self, map1, map2):
+        intersection = {}
+        for key in map1:
+            if key in map2:
+                intersection[key] = [[1, map1[key]], [2, map2[key]]]
+            else:
+                intersection[key] = [[1, map1[key]]]
+        for key in map2:
+            if key not in intersection:
+                intersection[key] = [[2, map2[key]]]
+
+        for key in intersection:
+            partition_name = self.partition(key)
+            list_str = str()
+            for val in intersection[key]:
+                list_str += str(val[0]) + " " + str(val[1]) + " "
+            self.file_write(self.path + "/P" + str(partition_name), key + " " + list_str)
+        return intersection
+
     def map(self, request, context):
         self.n_reducers = request.n_reducers
         self.query = request.query
         
         if request.query == 1:
             for file_name in request.input_split_files:
-                file_content = self.file_read(request.input_location + "\\" + file_name)
+                file_content = self.file_read(request.input_location + "/" + file_name)
                 for line in range(len(file_content)):
                     response = self._wordCount(line, file_content[line])
         
         elif request.query == 2:
             for file_name in range(len(request.input_split_files)):
-                file_content = self.file_read(request.input_location + "\\" + request.input_split_files[file_name])
+                file_content = self.file_read(request.input_location + "/" + request.input_split_files[file_name])
                 response = self._invertedIndex(request.input_split_file_id[file_name], file_content)
         
+        elif request.query == 3:
+            file_names = sorted(request.input_split_files)
+            # Assumption1: Two tables and two columns for input
+            # Assumption2: One column name is common
+            table1 = pd.read_csv(request.input_location + "/" + file_names[0], sep=", ", engine='python')
+            table2 = pd.read_csv(request.input_location + "/" + file_names[1], sep=", ", engine='python')
+            common_column = list(table2.columns.intersection(table1.columns))[0]
+            table1_map = self._naturalJoinMapCreator(table1, common_column)
+            table2_map = self._naturalJoinMapCreator(table2, common_column)
+            response = self._naturalJoin(table1_map, table2_map)
 
-        # TODO(Avishi): Other Function
         return mapper_pb2.MapResponse(intermediate_file_location = self.path, status = mapper_pb2.MapResponse.Status.SUCCESS)
 
 

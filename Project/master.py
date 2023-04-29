@@ -10,7 +10,7 @@ import os
 import time
 import subprocess
 # import pathlib
-import shutil
+import shutil, time
 from pathlib import Path
 from multiprocessing.pool import ThreadPool
 
@@ -35,18 +35,27 @@ class Master:
         mapper_i = 1
         file_i = 0
 
+        if self.query == 3:
+            chunk_size = 2
+        
+        idle_mapper_num = 0
         # first assigning chunk size number of files to each mapper
         while(mapper_i <= self.n_mappers):
             end = file_i + chunk_size
             file_list = []
             file_id_list = []
-            while(file_i<end):
+            while(file_i < end and file_i < n_input_files):
                 file_list.append(files[file_i])
                 file_id_list.append(file_i)
                 file_i = file_i + 1
-            mapper_to_files_mapping[mapper_i] = [file_list, file_id_list]
+            if len(file_list) != 0:
+                mapper_to_files_mapping[mapper_i] = [file_list, file_id_list]
+            else:
+                idle_mapper_num += 1
+                del self.mappers["mapper_" + str(mapper_i)]
             mapper_i  = mapper_i + 1
 
+        self.n_mappers -= idle_mapper_num
         # assignig remaining files (1 to each mapper)
         mapper_i = 1
         while(file_i < n_input_files):
@@ -106,7 +115,7 @@ class Master:
         partition = num - 1
         partition_paths = []
         for path in intermediate_file_locations:
-            partition_file_path = path + "\\P" + str(partition)
+            partition_file_path = path + "/P" + str(partition)
             partition_paths.append(partition_file_path)
         
         with grpc.insecure_channel('localhost:' + str(port), options=(('grpc.enable_http_proxy', 0),)) as channel:
@@ -125,7 +134,7 @@ class Master:
         input_array = []
         for i in range(len(list(self.mappers.items()))):
             input_array.append((mapper_to_files_mapping, list(self.mappers.items())[i]))
-        
+
         with ThreadPool() as pool:
             pool.starmap(self.mapFunction, input_array)
         
@@ -142,7 +151,7 @@ if __name__ == '__main__':
     logging.basicConfig()
 
     query = int(input("Enter query to perform WordCount[1], InvertedIndex[2], NaturalJoin[3]: ")) # valid input should be given
-    input_location = input("Enter input data location(folder name example: 'wordCount\\input'): ")
+    input_location = input("Enter input data location(folder name example: 'wordCount/input'): ")
     output_location = input("Enter output data location(folder name example: 'output'): ")
     n_mappers = int(input("Enter M (no of mappers): "))
     mappers = input("Enter ports of mappers separated by space (eg. 8080 8081 8082):").split()
@@ -156,13 +165,13 @@ if __name__ == '__main__':
     if Path("output").exists():
         shutil.rmtree("output")
 
-    # query = 1
-    # input_location = 'wordCount\input'
-    # output_location = 'output'
-    # n_mappers = 3
-    # mappers = [8080, 8081, 8082]
-    # n_reducers = 2
-    # reducers = [8086, 8087]
+    query = 3
+    input_location = 'naturalJoin/input'
+    output_location = 'output'
+    n_mappers = 2
+    mappers = [8083, 8084]
+    n_reducers = 1
+    reducers = [8810]
 
     mappers_new = {}
     m = 1
@@ -183,10 +192,12 @@ if __name__ == '__main__':
     mapper_to_files_mapping = master.input_split()
 
     master.map(mapper_to_files_mapping)
+    time.sleep(20)
     master.terminate_mappers(mappers_process)
 
     # print(map_intermediate_location)
 
     reducers_process = master.spawn_reducers(reducers_new)
     master.reduce(map_intermediate_location)
+    time.sleep(20)
     master.terminate_reducers(reducers_process)
