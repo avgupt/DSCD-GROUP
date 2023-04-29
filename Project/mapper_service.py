@@ -35,13 +35,13 @@ class MapperServiceServicer(mapper_pb2_grpc.MapperServiceServicer):
         for word in value.split(" "):
             value = 1
             partion_name = self.partition(word)
-            self.file_write(self.path + "/P" + partion_name, word + " " + str(value))
+            self.file_write(self.path + "/P" + partion_name, word.lower() + " " + str(value))
                 
     def _invertedIndex(self, key, value):
         for line in value:
             for word in line.split(" "):
                 partition_name = self.partition(word)
-                self.file_write(self.path + "/P" + partition_name, word + " " + str(key))
+                self.file_write(self.path + "/P" + partition_name, word.lower() + " " + str(key))
         
     def _naturalJoinMapCreator(self, table, common_column):
         a, b = [], []
