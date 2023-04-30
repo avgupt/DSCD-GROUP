@@ -39,8 +39,6 @@ class ReducerServiceServicer(reducer_pb2_grpc.ReducerServiceServicer):
         return final_output_path
     
     def naturalJoin_reduce_function(self, key, value):
-        print(key)
-        print(value)
         t1 = []
         t2 = []
         for i in range(0, len(value)-1, 2):
