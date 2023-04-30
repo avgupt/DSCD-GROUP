@@ -154,13 +154,13 @@ class Master:
 if __name__ == '__main__':
     logging.basicConfig()
 
-    # query = int(input("Enter query to perform WordCount[1], InvertedIndex[2], NaturalJoin[3]: ")) # valid input should be given
-    # input_location = input("Enter input data location(folder name example: 'wordCount/input'): ")
-    # output_location = input("Enter output data location(folder name example: 'output'): ")
-    # n_mappers = int(input("Enter M (no of mappers): "))
-    # mappers = input("Enter ports of mappers separated by space (eg. 8080 8081 8082):").split()
-    # n_reducers = int(input("Enter R (no of reducers): "))
-    # reducers = input("Enter ports of reducers separated by space (eg. 8080 8081 8082):").split()
+    query = int(input("Enter query to perform WordCount[1], InvertedIndex[2], NaturalJoin[3]: ")) # valid input should be given
+    input_location = input("Enter input data location(folder name example: 'wordCount/input'): ")
+    output_location = input("Enter output data location(folder name example: 'output'): ")
+    n_mappers = int(input("Enter M (no of mappers): "))
+    mappers = input("Enter ports of mappers separated by space (eg. 8080 8081 8082):").split()
+    n_reducers = int(input("Enter R (no of reducers): "))
+    reducers = input("Enter ports of reducers separated by space (eg. 8080 8081 8082):").split()
 
     # Delete folder and output
     if Path("folders").exists():
@@ -169,13 +169,13 @@ if __name__ == '__main__':
     if Path("output").exists():
         shutil.rmtree("output")
 
-    query = 2
-    input_location = 'invertedIndex/input'
-    output_location = 'output'
-    n_mappers = 4
-    mappers = [8085, 8086, 8087, 8088]
-    n_reducers = 2
-    reducers = [8810, 8811]
+    # query = 3
+    # input_location = 'naturalJoin/input'
+    # output_location = 'output'
+    # n_mappers = 4
+    # mappers = [8080, 8081, 8082, 8083]
+    # n_reducers = 2
+    # reducers = [8810, 8811]
 
     mappers_new = {}
     m = 1
