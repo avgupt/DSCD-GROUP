@@ -41,13 +41,13 @@ class ReducerServiceServicer(reducer_pb2_grpc.ReducerServiceServicer):
     def naturalJoin_reduce_function(self, key, value):
         t1 = []
         t2 = []
+        final_output_path = self.path + "/" + self.reducer_name
         for i in range(0, len(value)-1, 2):
             if value[i] == '1':
                 t1.append(value[i+1])
             else:
                 t2.append(value[i+1])
         combinations = list(itertools.product(t1, t2))
-        final_output_path = self.path + "/" + self.reducer_name
         for combination in combinations:
             self.file_write(final_output_path , key + " " + str(combination[0]) + " " + str(combination[1]))
         return final_output_path
@@ -81,9 +81,14 @@ class ReducerServiceServicer(reducer_pb2_grpc.ReducerServiceServicer):
     def _naturalJoin(self, partition_files_path):
         self.shuffled_and_sorted_data = {}
         for file_path in partition_files_path:
+            first_line = True
             with open(file_path, "r") as file:
                 for line in file:
                     data = line.split()
+                    if first_line:
+                        col_names = data
+                        first_line = False
+                        continue
                     key = data[0]
                     value = data[1:]
                     if key in self.shuffled_and_sorted_data:
@@ -91,6 +96,8 @@ class ReducerServiceServicer(reducer_pb2_grpc.ReducerServiceServicer):
                     else:
                         self.shuffled_and_sorted_data[key] = value
         
+        final_output_path = self.path + "/" + self.reducer_name
+        self.file_write(final_output_path , " ".join(col_names))
         for key in sorted(self.shuffled_and_sorted_data.keys()):
             final_output_path = self.naturalJoin_reduce_function(key, self.shuffled_and_sorted_data[key])
 

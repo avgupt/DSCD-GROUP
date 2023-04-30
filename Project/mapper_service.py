@@ -46,15 +46,20 @@ class MapperServiceServicer(mapper_pb2_grpc.MapperServiceServicer):
     def _naturalJoinMapCreator(self, table, common_column):
         a, b = [], []
         table.sort_values(common_column)
+        col_name = ""
         for col in table.columns:
             if col == common_column:
                 a = list(table[col])
             else:
+                col_name = col
                 b = list(table[col])
-        return dict(zip(a, b))
+        return dict(zip(a, b)), col_name
 
-    def _naturalJoin(self, map1, map2):
+    def _naturalJoin(self, map1, map2, col_names):
         intersection = {}
+        for i in range(self.n_reducers):
+            self.file_write(self.path + "/P" + str(i), " ".join(col_names))
+        
         for key in map1:
             if key in map2:
                 intersection[key] = [[1, map1[key]], [2, map2[key]]]
@@ -94,9 +99,9 @@ class MapperServiceServicer(mapper_pb2_grpc.MapperServiceServicer):
             table1 = pd.read_csv(request.input_location + "/" + file_names[0], sep=", ", engine='python')
             table2 = pd.read_csv(request.input_location + "/" + file_names[1], sep=", ", engine='python')
             common_column = list(table2.columns.intersection(table1.columns))[0]
-            table1_map = self._naturalJoinMapCreator(table1, common_column)
-            table2_map = self._naturalJoinMapCreator(table2, common_column)
-            response = self._naturalJoin(table1_map, table2_map)
+            table1_map, table1_col = self._naturalJoinMapCreator(table1, common_column)
+            table2_map, table2_col = self._naturalJoinMapCreator(table2, common_column)
+            response = self._naturalJoin(table1_map, table2_map, [common_column, table1_col, table2_col])
 
         return mapper_pb2.MapResponse(intermediate_file_location = self.path, status = mapper_pb2.MapResponse.Status.SUCCESS)
 
