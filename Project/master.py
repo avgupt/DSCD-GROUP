@@ -31,12 +31,16 @@ class Master:
         print("input files: ", files)
         n_input_files = len(files)
         mapper_to_files_mapping = {}  # dict of the form {mapper_number: ([input1.txt], 1)}
-        chunk_size = n_input_files // self.n_mappers
+        
+        if self.query == 3:
+            chunk_size = 2        
+        elif self.n_mappers > n_input_files:
+            chunk_size = 1
+        else:
+            chunk_size = n_input_files // self.n_mappers
+        
         mapper_i = 1
         file_i = 0
-
-        if self.query == 3:
-            chunk_size = 2
         
         idle_mapper_num = 0
         # first assigning chunk size number of files to each mapper
